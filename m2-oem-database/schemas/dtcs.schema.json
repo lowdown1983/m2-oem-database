@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "entries": {
+      "items": {
+        "properties": {
+          "category": {
+            "enum": [
+              "P",
+              "C",
+              "B",
+              "U"
+            ]
+          },
+          "code": {
+            "description": "DTC as displayed: standard P/C/B/U + 4 hex (optional UDS failure-type byte, e.g. P261F71); BMW factory hex (e.g. 2A82); Honda blink codes (e.g. SRS-1-1, ABS-31); Volvo module codes (e.g. CEM-1A51).",
+            "pattern": "^([PCBU][0-9A-F]{4}([0-9A-F]{2})?|[0-9A-F]{4}|(SRS|ABS|VSA)-[0-9]+(-[0-9]+)?|[A-Z]{2,4}-[0-9A-F]{4})$",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "diagnostic_notes": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "grade": {
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          "make": {
+            "description": "'generic' for SAE J2012 codes, else a make key from makes.yaml",
+            "type": "string"
+          },
+          "possible_causes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "scope": {
+            "description": "generic = SAE J2012; manufacturer = OEM-specific",
+            "enum": [
+              "generic",
+              "manufacturer"
+            ]
+          }
+        },
+        "required": [
+          "make",
+          "code",
+          "description",
+          "category",
+          "scope",
+          "grade"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "entries"
+  ],
+  "title": "M2 OEM database \u2014 DTC catalog (v1.2)",
+  "type": "object"
+}

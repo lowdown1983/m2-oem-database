@@ -1,0 +1,32 @@
+{
+  "pack": "M2/SuperB OEM Vehicle Database",
+  "pack_version": "1.4.0",
+  "date": "2026-10-07",
+  "files": [
+    "_meta.json",
+    "asbuilt.json",
+    "diagnostics.json",
+    "dids.json",
+    "dtcs.json",
+    "makes.json",
+    "module_maps.json",
+    "vehicles.json"
+  ],
+  "counts": {
+    "makes": 13,
+    "buses": 45,
+    "legacy_protocols": 29,
+    "m2_mappings": 60,
+    "diagnostic_services": 42,
+    "gateways": 20,
+    "dbc_files": 45,
+    "messages": 3136,
+    "signals": 23042,
+    "dtcs": 4411,
+    "dtcs_generic": 2143,
+    "dtcs_manufacturer": 2268,
+    "dids": 637,
+    "asbuilt_modules": 41,
+    "module_map_platforms": 51
+  }
+}

@@ -1,0 +1,282 @@
+entries:
+- address: '701'
+  module: Global Positioning Sensor Module (GPSM)
+  blocks: []
+  notes: Deprecated module; replaced by SYNC 3 and the new GPS antenna. No longer used.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing (scribd)"
+- address: '706'
+  module: "Image Processing Module A (IPMA) \u2014 forward driving assist, lane keeping/departure warning (Gentex or Mobileye)"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings (multiple)"
+- address: '712'
+  module: "Seat Control Module G (SCMG) \u2014 driver lumbar and massage control"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '713'
+  module: "Seat Control Module H (SCMH) \u2014 passenger lumbar and massage control"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '714'
+  module: Heated Steering Wheel Module (HSWM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan setup guide module table"
+- address: '716'
+  module: Gateway Module A (GWM)
+  blocks: []
+  notes: Gateway itself carries no user-configurable as-built lines.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '720'
+  module: Instrument Panel Cluster (IPC)
+  blocks:
+  - 720-01-01
+  - 720-01-02
+  - 720-01-03
+  - 720-04-01
+  - 720-07-01
+  notes: "Cluster configuration: chimes, displayed temps, trailer-brake gain display, quick-boot. See \xA74 for well-known\
+    \ blocks."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings + F150 code spreadsheets"
+- address: '721'
+  module: Vehicle Dynamics Module (VDM)
+  blocks: []
+  notes: 2020MY+ only.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '724'
+  module: "Steering Column Control Module (SCCM) \u2014 steering wheel adjustments, switches, turn signals"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings + F150 code sheets"
+- address: '725'
+  module: Wireless Accessory Charging Module (WACM)
+  blocks: []
+  notes: 2020MY+ only.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '726'
+  module: Body Control Module (BCM / BdyCM; "BCE" on the Motorcraft portal)
+  blocks:
+  - 726-01-01
+  - 726-01-02
+  - 726-08-01
+  - 726-17-01
+  - 726-21-01
+  - 726-25-02
+  - 726-28-02
+  - 726-30-01
+  - 726-37-01
+  - 726-41-02
+  - 726-42-01
+  - 726-48-02
+  notes: "The most-modified module in the FORScan community. VIN stored at 726-09-01 through 726-11-01 (16-19MY). See \xA7\
+    4 for well-known blocks."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings + F150/Super Duty code spreadsheets"
+- address: '727'
+  module: "Audio Control Module (ACM) \u2014 radio module / CD player, Sirius"
+  blocks: []
+  notes: MS-CAN module on many platforms.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings + F150 code sheets"
+- address: '730'
+  module: "Power Steering Control Module (PSCM) \u2014 Nexteer unit on 2017MY+"
+  blocks: []
+  notes: Contains a wheel-size field. Listed without address in the FORScan setup-guide table; address confirmed in the Explorer
+    11-23MY listing.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '731'
+  module: Remote Function Actuator (RFA)
+  blocks: []
+  notes: 2011-2015MY only.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '732'
+  module: Gear Shift Module (GSM)
+  blocks: []
+  notes: 2020MY-23MY only.
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '733'
+  module: "HVAC \u2014 Heating, Ventilation, Air Conditioning"
+  blocks: []
+  notes: "Address 733 was EATC (Electronic Automatic Temperature Control) on 2011-2015MY \u2014 same address, renamed module.\
+    \ VIN stored at 733-02-01 through 733-02-04."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '736'
+  module: Parking Assist Control Module (PAM)
+  blocks: []
+  notes: "As-built change recommended for SYNC 2 \u2192 SYNC 3 upgrades."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing + F150 code sheets"
+- address: '737'
+  module: "Restraint Control Module (RCM) \u2014 airbags, seatbelts"
+  blocks: []
+  notes: Contains seat/seatbelt configuration data. RCM as-built also appears on the Motorcraft portal (737-01-01 example
+    lines).
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing; fordownersclub"
+- address: '740'
+  module: Driver Door Module (DDM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan tutorial + F150 code sheets"
+- address: '741'
+  module: Passenger Door Module (PDM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan tutorial + F150 code sheets"
+- address: '744'
+  module: Driver Seat Module (DSM)
+  blocks: []
+  notes: "\u2014"
+  grade: C
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing (single source)"
+- address: '751'
+  module: "Radio Transceiver Module (RTM) \u2014 also listed as tire-pressure monitor receiver in some sources"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: '757'
+  module: Trailer Brake Control Module (TBM / TBC)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: '760'
+  module: Anti-Lock Brake System (ABS)
+  blocks: []
+  notes: "2011-2015 Explorer/Police Utility lists show ABS at 76D \u2014 address is model-year/platform dependent; 760 is\
+    \ the current address [conflict reported, resolved by recency]."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing + F150 code sheets"
+- address: '761'
+  module: Transfer Case Control Module (TCCM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: '764'
+  module: Cruise Control Module (CCM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: '766'
+  module: Running Board Control Module (RBM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: '776'
+  module: Seat Control Module E (SCME)
+  blocks: []
+  notes: "\u2014"
+  grade: C
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing (single source)"
+- address: '783'
+  module: Audio Digital Signal Processing Module (DSP)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: '791'
+  module: Trailer Module (TRM)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: 7A5
+  module: Front Control/Display Interface Module (FCDIM)
+  blocks: []
+  notes: "Some modules in this family (FDIM) require UDS 0x27 Security Access to modify VIN in as-built data [B \u2014 FG-Falcon\
+    \ VIN guide]."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing; FG-Falcon guide"
+- address: 7A7
+  module: Front Controls Interface Module (FCIM)
+  blocks: []
+  notes: "2011-2015 Explorer/Police Utility lists show FCIM at 75A \u2014 address is model-year/platform dependent; 7A7 is\
+    \ the current address [conflict reported, resolved by recency]."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: 7B1
+  module: "Image Processing Module B (IPMB) \u2014 reverse camera module"
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings"
+- address: 7B2
+  module: Heads-Up Display (HUD)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: 7C4
+  module: Side Obstacle Detection Control Module, Left (SODL)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: 7C6
+  module: Side Obstacle Detection Control Module, Right (SODR)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: 7D0
+  module: "Accessory Protocol Interface Module (APIM) \u2014 SYNC module"
+  blocks:
+  - 7D0-01-01
+  - 7D0-01-02
+  - 7D0-02-01
+  - 7D0-03-01
+  - 7D0-04-02
+  - 7D0-09-02
+  notes: "The SYNC configuration hub: audio sources, DSP, camera, themes, nav-in-motion. Block 8-9 not available on SYNC 3.0\
+    \ [C \u2014 scribd Explorer guide]. See \xA74."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings + F150/Super Duty/Explorer code spreadsheets"
+- address: 7D5
+  module: Digital Audio Control Module C (DACMC)
+  blocks: []
+  notes: "\u2014"
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Explorer 11-23MY FORScan module listing"
+- address: 7D7
+  module: "GSM alternate \u2014 NOT VERIFIED. The brief listed 7D7 as a candidate address, but no source in this pass confirms\
+    \ a module at 7D7; the Explorer 11-23MY listing places the Gear Shift Module at 732 (2020MY+). Treat 7D7 as unverified\
+    \ [?]."
+  blocks: []
+  notes: Do not use without on-vehicle verification.
+  grade: C
+  evidence: "OEM-FORD-ASBUILT \u2014 none found \u2014 flagged unverified"
+- address: 7E0
+  module: Powertrain Control Module (PCM)
+  blocks: []
+  notes: "Primary powertrain module; UDS request ID 7E0 \u2192 response 7E8 (+8 convention)."
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 FORScan community module listings; Motorcraft AsBuilt portal sample"
+- address: 7E1
+  module: Transmission Control Module (TCM)
+  blocks: []
+  notes: Address confirmed by two independent FORScan community sources; one setup-guide copy truncates it as "70" (transcription
+    artifact, not a distinct address) [conflict reported, resolved].
+  grade: B
+  evidence: "OEM-FORD-ASBUILT \u2014 Super Duty FORScan codes guide; fordownersclub module list ---"

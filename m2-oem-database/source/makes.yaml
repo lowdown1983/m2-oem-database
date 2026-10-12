@@ -1,0 +1,963 @@
+makes:
+- make: gm
+  full_name: General Motors (Chevrolet / Buick / GMC / Cadillac)
+  buses:
+  - name: High-Speed GMLAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2004+ (full by 2008)
+    grade: A
+    notes: Powertrain/chassis bus. 120-ohm terminators at each end; ~60 ohms across DLC 6/14 (key off) is the standard health
+      check.
+    evidence: OEM-GM-TECH (three buses, BCM gateway); OEM-GM-PIN (pins 6/14)
+  - name: Mid-Speed GMLAN
+    bitrate_kbps: 95.2
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: 2004+
+    grade: A
+    notes: "Infotainment (display, navigation). BITRATE CONFLICT: ACDelco says 95.2 kbps [A]; GM Enhanced Diag spec excerpt\
+      \ says 'approximately 95.2 or 125 kbps' [B] \u2014 treat as model-dependent."
+    evidence: OEM-GM-TECH (95.2 kbps); OEM-GM-PIN (pins 3/11); OEM-GM-SPEC (95.2-or-125 conflict)
+  - name: Single-Wire (Low-Speed) GMLAN
+    bitrate_kbps: 33.33
+    obd2_pins:
+    - 1
+    wire_count: 1
+    years: 2004+
+    grade: B
+    notes: Per GMW3089. 83.33 kbps high-speed mode used for flashing (transceiver must switch, not just the CAN bitrate).
+      Sleeping nodes REQUIRE high-voltage wake-up before they answer normal traffic.
+    evidence: OEM-GM-NXP (GMW3089v2.4, 33.33/83.33 kbps, HV wake-up); OEM-GM-PIN (pin 1)
+  - name: Second High-Speed GMLAN (select models)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 12
+    - 13
+    wire_count: 2
+    years: model-dependent
+    grade: C
+    notes: "CONFLICT: a 2010 Camaro reportedly has a second HS bus on DLC 12/13 [C], but the 2002 Intrepid pinout labels 12/13\
+      \ 'LSFT H/L' (discretionary) [B]. Pin 12/13 usage varies by model/year \u2014 verify per vehicle."
+    evidence: OEM-GM-COMM (2010 Camaro report [C]); OEM-GM-PIN (12/13 discretionary [B])
+  legacy:
+  - protocol: Class 2 / SAE J1850 VPW
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 2
+    years: "1996\u2013~2007 (gradual, model-dependent)"
+    grade: B
+    notes: "VPW uses pin 2 ONLY (pin 10 is the J1850 PWM negative leg \u2014 Ford, not GM). Phase-in of GMLAN began 2004;\
+      \ 2005 Colorado/Yukon still VPW per owner reports; complete by the 2008 federal CAN mandate."
+    evidence: OEM-GM-COMM (year anecdotes); 2008 mandate (regulatory fact)
+  m2_mapping:
+  - m2_hardware: CAN0 (TJA1051, HSC_BUS)
+    bus: High-Speed GMLAN (6/14)
+    notes: 500 kbps via due_can. Standard M2RET/ELM path.
+  - m2_hardware: CAN1 (TJA1051, MSC_BUS)
+    bus: Mid-Speed GMLAN (3/11)
+    notes: "The M2's CAN1 transceiver is wired to DLC 3/11 \u2014 exactly the GMLAN mid-speed pins. No extra hardware needed;\
+      \ set due_can to 95.2 or 125 kbps per model."
+  - m2_hardware: SWCAN (MCP2515 + TH8056, SWC_BUS)
+    bus: Single-Wire GMLAN (pin 1)
+    notes: setupSW(33) normal / setupSW(83) flashing; mode(2) HV-wake BEFORE expecting replies from sleeping modules, then
+      mode(3).
+  - m2_hardware: J1850 discrete circuit, VPW mode (pin 50 LOW)
+    bus: Class 2 (pin 2)
+    notes: 'VPW-only on GM: use pin 52 (VPW RX) / pin 53 (J1850+ TX). M2 J1850- (DLC pin 10) has no GM use.'
+- make: ford
+  full_name: Ford / Lincoln / Mercury
+  buses:
+  - name: HS-CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2004+ (full by 2008)
+    grade: B
+    notes: "Powertrain bus; also the legislated emissions bus (ISO 15765-4) \u2014 any generic OBD-II tool sees it. Modules:\
+      \ PCM, TCM, ABS, EPAS."
+    evidence: OEM-FORD-COMM (pinout consensus); legislated emissions bus (SAE J1979)
+  - name: MS-CAN
+    bitrate_kbps: 125
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: ~2003+ (not all models)
+    grade: B
+    notes: "Ford-PROPRIETARY pins \u2014 dead on non-Ford vehicles. Body/comfort: GEM, doors, cluster, RCM, EATC. This pin\
+      \ split is why FORScan needs the HS/MS toggle on ELM327 adapters. BITRATE CONFLICT: one community glossary claims '125-500\
+      \ kbps depending on chassis' [C] vs unanimous 125 kbps \u2014 treat 125 as standard. MS-CAN is NOT on all Fords: probe,\
+      \ don't assume."
+    evidence: OEM-FORD-FORSCAN (adapter table, pins 3/11); OEM-FORD-COMM (125 kbps consensus)
+  - name: HS-CAN2
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: newer platforms
+    grade: C
+    notes: Second high-speed bus on newer platforms (FDSM, ABS, RCM, PSCM, SCCM, GWM, IPMA per one vendor source). DLC availability
+      varies; often gateway-internal only.
+    evidence: OEM-FORD-COMM (kanbkam adapter listing [C])
+  - name: CAN FD
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2021+ select models (F-150, Lightning, Mach-E, Escape 2023+, Expedition/Navigator 2022+, Nautilus 2024)
+    grade: B
+    notes: 'M2 CANNOT PARTICIPATE: TJA1051 transceivers are CAN 2.0 only. 2021+ CAN-FD Fords are out of scope for M2 CAN work
+      (hardware fact from the knowledge pack; vehicle consequence inferred but solid).'
+    evidence: OEM-FORD-OPEN (CANFD platform list, verified in opendbc values.py); OEM-KPACK (TJA1051 CAN 2.0 only)
+  legacy:
+  - protocol: SCP / SAE J1850 PWM
+    bitrate_kbps: 41.6
+    obd2_pins:
+    - 2
+    - 10
+    years: "1996\u2013~2006 (model-dependent); all-CAN by 2008 mandate"
+    grade: B
+    notes: "Ford's SCP variant REQUIRES In-Frame Response (IFR) bytes \u2014 unlike GM's VPW. Timeline approx: 1996-2001 PWM-only,\
+      \ 2002-2006 mixed by model, post-2006 CAN."
+    evidence: OEM-FORD-COMM (AutoEnginuity docs, Ford training material)
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: HS-CAN (6/14) @ 500 kbps
+    notes: Standard path.
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: MS-CAN (3/11) @ 125 kbps
+    notes: "KEY M2 ADVANTAGE: a switched ELM327 sees one bus at a time, but the M2's two independent CAN controllers can watch\
+      \ HS-CAN and MS-CAN SIMULTANEOUSLY \u2014 FORScan+ELM327 cannot do this."
+  - m2_hardware: J1850 discrete circuit, PWM mode (pin 50 HIGH)
+    bus: SCP (pins 2/10)
+    notes: Pre-2004 Fords. IFR bytes REQUIRED by Ford's SCP variant.
+  - m2_hardware: LIN1/LIN2 (TJA1027)
+    bus: Body LIN sub-buses
+    notes: Door/climate sub-buses on some models, if tapped at the module.
+  - m2_hardware: NONE
+    bus: CAN FD (2021+)
+    notes: "Out of scope \u2014 TJA1051 is CAN 2.0 only."
+- make: stellantis
+  full_name: Stellantis (Chrysler / Dodge / Jeep / RAM / Fiat / Alfa Romeo)
+  buses:
+  - name: CAN-C1
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: ~2004/05+
+    grade: A
+    notes: Powertrain/chassis high-speed CAN (SAE J2284). 11-bit identifiers the norm. 120-ohm terminators; ~60 ohms per pair
+      (key off) = continuity check.
+    evidence: OEM-STLA-STAR (pins 6/14 [A]); OEM-STLA-COMM (500 kbps [B], 11-bit IDs [B])
+  - name: CAN-C2
+    bitrate_kbps: 500
+    obd2_pins:
+    - 12
+    - 13
+    wire_count: 2
+    years: some platforms
+    grade: C
+    notes: "Second high-speed CAN on some platforms (e.g. Alfa/Fiat 'second high-speed CANBUS' per aftermarket vendors). Pins\
+      \ confirmed [A]; BITRATE UNCONFIRMED \u2014 treat 500 kbps as provisional."
+    evidence: OEM-STLA-STAR (pins 12/13 [A]); OEM-STLA-COMM (bitrate [?])
+  - name: CAN-BH
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: ~2004/05+
+    grade: C
+    notes: Body/harness CAN. Pins confirmed [A]; BITRATE UNCONFIRMED. NOT reachable with stock M2 hardware (both native CAN
+      controllers spoken for by C1/C2; MCP2515 is tied to the SWCAN transceiver).
+    evidence: OEM-STLA-STAR (pins 3/11 [A])
+  - name: CAN-IHS
+    bitrate_kbps: 125
+    obd2_pins: []
+    wire_count: 2
+    years: ~2004/05+
+    grade: B
+    notes: "'Interior High Speed' is the SLOW bus (125 kbps) \u2014 the name misleads. Interior/comfort modules. Not on the\
+      \ DLC; reachable only via gateway or direct tap."
+    evidence: OEM-STLA-COMM (125 kbps, SAE Class B)
+  legacy:
+  - protocol: PCI / SAE J1850 VPW
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 2
+    years: "~1999\u2013~2005 (model-dependent)"
+    grade: B
+    notes: Single wire, idle low, active high ~7-7.5V. Used for inter-module comms and scan-tool/flash until CAN replaced
+      it.
+    evidence: OEM-STLA-COMM
+  - protocol: CCD (Chrysler Collision Detection)
+    bitrate_kbps: 7.8125
+    obd2_pins:
+    - 3
+    - 11
+    years: "1988\u2013~1998"
+    grade: C
+    notes: "Proprietary 2-wire bus. TRAP: pins 3/11 were later recycled for CAN-BH \u2014 year/model determines which protocol\
+      \ is on those pins."
+    evidence: OEM-STLA-COMM
+  - protocol: SCI (SAE J2610, Chrysler-proprietary serial)
+    obd2_pins:
+    - 6
+    - 7
+    - 9
+    - 12
+    - 14
+    - 15
+    wire_count: 1
+    years: "1990s\u2013early 2000s (PCM/TCM flashing)"
+    grade: C
+    notes: "UART-based proprietary serial for PCM/TCM diagnostics and flash reprogramming. Multiple channels (SCI A Engine/Trans,\
+      \ SCI B); pin assignments vary by model/year. M2 HAS NO SCI HARDWARE \u2014 pre-CAN Chrysler powertrain flashing via\
+      \ SCI is out of reach for stock M2 firmware."
+    evidence: OEM-STLA-COMM
+  - protocol: K-line (ISO 9141-2 / ISO 14230)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    wire_count: 1
+    years: "1996\u2013~2004"
+    grade: B
+    notes: On many 1996-~2004 models alongside PCI/SCI. M2 K-line transceiver (TJA1027) covers this.
+    evidence: OEM-STLA-COMM
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: CAN-C1 (6/14) @ 500 kbps
+    notes: Primary diagnostic bus. On 2018+ SGW vehicles, reads work through the gateway; writes are blocked.
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: CAN-C2 (12/13)
+    notes: Second native controller covers this where present.
+  - m2_hardware: NONE (stock)
+    bus: CAN-BH (3/11)
+    notes: "Not reachable with stock M2 hardware \u2014 would need an external CAN transceiver on SPI."
+  - m2_hardware: J1850 discrete circuit, VPW mode (pin 50 LOW)
+    bus: PCI (pin 2)
+    notes: Pre-CAN Chrysler.
+  - m2_hardware: K-line (TJA1027)
+    bus: ISO 9141 K-line (pin 7)
+    notes: 1996-~2004 models.
+  - m2_hardware: LIN1/LIN2 (TJA1027)
+    bus: LIN sub-buses (e.g. CCN -> multifunction switch)
+    notes: If tapped at the module; plain 19.2k-class LIN.
+  - m2_hardware: NONE
+    bus: SCI (J2610)
+    notes: "No M2 hardware support \u2014 proprietary serial, not J1850/K-line/LIN."
+- make: toyota
+  full_name: Toyota / Lexus
+  buses:
+  - name: CAN V Bus (HS)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: 'Powertrain/chassis: ECM, HV ECU, battery ECU, skid control, EPS, airbag, gateway ECU. Termination spec 54-69 ohms
+      across 6/14 (ignition off) [A].'
+    evidence: OEM-TOYOTA-TRAIN (500k HS); OEM-TOYOTA-SVC (pins 6/14, 54-69 ohm [A])
+  - name: MS-CAN
+    bitrate_kbps: 250
+    obd2_pins: []
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: "Body/comfort traffic BEHIND the gateway ECU \u2014 not on the DLC in any source found. A scan tool reaches it\
+      \ only through gateway routing."
+    evidence: OEM-TOYOTA-TRAIN (250k MS); DLC absence inferred from gateway architecture [C]
+  legacy:
+  - protocol: K-line / SIL (ISO 9141-2)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: pre-2008+ (survived into CAN era)
+    grade: B
+    notes: DLC3 pin 7 (SIL), optional L-line pin 15. Non-CAN modules (TPMS, air suspension) used K-line deep into the CAN
+      era.
+    evidence: OEM-TOYOTA-SVC (SIL pulse on pin 7 [A]); OEM-TOYOTA-COMM
+  - protocol: BEAN (Body Electronics Area Network)
+    bitrate_kbps: 10
+    obd2_pins: []
+    wire_count: 1
+    years: early 2000s+
+    grade: B
+    notes: "Toyota-PROPRIETARY single-wire body bus, 0-10V. NO M2 HARDWARE SUPPORT \u2014 not J1850, not K-line, not LIN."
+    evidence: OEM-TOYOTA-TRAIN (BEAN 10k); community RE frame format [C]
+  - protocol: AVC-LAN
+    bitrate_kbps: 17.8
+    obd2_pins: []
+    wire_count: 2
+    years: early 2000s+
+    grade: B
+    notes: Toyota-proprietary audio/visual bus; star topology. Not a diagnostic target.
+    evidence: OEM-TOYOTA-TRAIN
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: HS CAN V Bus (6/14) @ 500 kbps
+    notes: Primary diagnostic + logging bus. One controller normally suffices at the DLC (no HS/MS pin split like Ford).
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: MS-CAN @ 250 kbps
+    notes: "Only if tapped behind the gateway (interior harness) \u2014 not on the DLC."
+  - m2_hardware: K-line (TJA1027)
+    bus: SIL K-line (pin 7) @ 10.4 kbps
+    notes: Non-CAN modules on CAN-era vehicles; pre-CAN diagnostics.
+  - m2_hardware: LIN1/LIN2 (TJA1027)
+    bus: LIN sub-buses @ 9.6 kbps
+    notes: If tapped at the module.
+  - m2_hardware: NONE
+    bus: BEAN
+    notes: "Out of reach \u2014 proprietary 0-10V single-wire protocol, no M2 hardware speaks it."
+- make: honda
+  full_name: Honda / Acura
+  buses:
+  - name: F-CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2003+
+    grade: A
+    notes: "Powertrain bus: ECM/PCM, TCM, ABS/VSA, EPS, SRS. TWO SEGMENTS: F-CAN A (OBD-II/diagnostic side) and F-CAN B (internal\
+      \ powertrain) \u2014 openpilot relays between them."
+    evidence: OEM-HONDA-SVC (500k [A]); opendbc hondacan.py (A/B segments [B])
+  - name: B-CAN
+    bitrate_kbps: 33.33
+    obd2_pins: []
+    wire_count: 1
+    years: 2006+
+    grade: A
+    notes: "Body CAN: gauge module, MICU, climate, immobilizer-keyless. SINGLE-WIRE 33.33 kbps per service manual. NEVER at\
+      \ the DLC \u2014 requires a behind-dash tap (BCM 36-pin connector on 2016 Civic/2017 CR-V). SPEED CONFLICT: one community\
+      \ project claims 150 kbps on 2016+ [C] \u2014 unverified, contradicts the manual."
+    evidence: 'OEM-HONDA-SVC (single-wire 33.33k [A]); conflict: vanillagorillaa project [C]'
+  - name: IMA CAN (hybrids)
+    obd2_pins: []
+    wire_count: 2
+    years: hybrids
+    grade: B
+    notes: Separate CAN bus for the Integrated Motor Assist hybrid system; own malfunction DTCs.
+    evidence: OEM-HONDA-COMM (2019 Civic scan report)
+  legacy:
+  - protocol: K-line (ISO 9141-2)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 1990s-2010s
+    grade: A
+    notes: Honda was a heavy K-line user and NEVER used J1850. Pin 7 kept populated alongside CAN into the 2010s (SRS/ABS/VSA/EPS/immobilizer
+      K-line troubleshooting in service manual).
+    evidence: OEM-HONDA-SVC (DLC pin 7 K-line circuit [A])
+  - protocol: SCS (Service Check Signal)
+    obd2_pins:
+    - 9
+    years: 1990s+
+    grade: B
+    notes: 'Honda-SPECIFIC pin 9: grounding it puts modules into service-check / blink-code mode. Readable as a digital input;
+      a diagnostic aid, not a bus.'
+    evidence: OEM-HONDA-COMM
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: F-CAN (6/14) @ 500 kbps
+    notes: This is F-CAN A (diagnostic side) at the DLC; F-CAN B (powertrain) sits behind the gateway.
+  - m2_hardware: SWCAN (MCP2515 + TH8056)
+    bus: B-CAN 33.33k single-wire
+    notes: "NATURAL FIT (inferred): single-wire 33.33 kbps CAN matches the TH8056. setupSW(33). ONLY via BCM-harness tap \u2014\
+      \ never the DLC. Caveat: if the 150 kbps B-CAN claim proves true for 2016+, the TH8056 cannot do that rate."
+  - m2_hardware: K-line (TJA1027)
+    bus: K-line (pin 7) @ 10.4 kbps
+    notes: Pre-CAN diagnostics and still-populated K-line on CAN-era Hondas.
+  - m2_hardware: 12VIO digital input
+    bus: SCS (pin 9)
+    notes: Readable as a digital input; grounding enters service-check mode.
+  - m2_hardware: NONE
+    bus: J1850
+    notes: "Honda never used J1850 \u2014 the M2 J1850 hardware has no Honda application."
+- make: vw
+  full_name: Volkswagen Group (VW / Audi / SEAT / Skoda)
+  buses:
+  - name: Diagnosis CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: "THE single CAN pair on the DLC \u2014 it is the diagnosis CAN to the J533 gateway. VW does NOT put comfort/infotainment\
+      \ CAN pairs on the DLC; those are gateway-internal."
+    evidence: OEM-VW-SSP (diagnosis CAN); DLC pinout consensus [B]
+  - name: Powertrain CAN
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: Engine, transmission, ABS. Gateway-internal; reached through J533 routing from the DLC pair.
+    evidence: OEM-VW-SSP (five CAN networks)
+  - name: Convenience CAN
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: Windows, locks, doors. 100 kbps on PQ-era (A8L SSP287); ALL buses moved to 500 kbps on MQB (Tiguan SSP553). Gateway-internal.
+    evidence: OEM-VW-SSP (100k PQ [B]; all-500k MQB [B])
+  - name: Infotainment CAN
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: 2004+
+    grade: B
+    notes: "Radio, navigation. Gateway-internal. MOST (fibre-optic, 25M PQ / 150M MQB) carries premium audio \u2014 electrically\
+      \ invisible to any CAN tool."
+    evidence: OEM-VW-SSP
+  - name: CAN FD (MQB Evo)
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2020+
+    grade: C
+    notes: "UNCONFIRMED in this pass \u2014 one forum poster mentions CAN-FD DBCs assumed MQB Evo. If confirmed, those buses\
+      \ are OUT OF M2 SCOPE (TJA1051 = CAN 2.0 only)."
+    evidence: OEM-VW-COMM (unconfirmed [?]
+  legacy:
+  - protocol: K-line (ISO 9141-2)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: pre-2004+ (remnants)
+    grade: B
+    notes: DLC pin 7 bidirectional, L-line pin 15 optional wake-up. Retained on early CAN-era cars for some modules.
+    evidence: OEM-VW-COMM
+  - protocol: KWP-1281 (VAG proprietary)
+    obd2_pins:
+    - 7
+    years: ~1995-2006
+    grade: B
+    notes: '5-baud init. ECU addresses: 0x01 engine, 0x03 ABS, 0x08 HVAC, 0x17 instruments, 0x19 gateway, 0x46 central convenience.'
+    evidence: OEM-VW-COMM (community protocol doc + Arduino implementation)
+  - protocol: KWP2000 (ISO 14230)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 2003+ pre-CAN
+    grade: B
+    notes: Fast init (~500ms), up to 255-byte messages. Common on 2003+ pre-CAN VAG vehicles.
+    evidence: OEM-VW-COMM
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: Diagnosis CAN (6/14) @ 500 kbps
+    notes: "Primary diagnostic path \u2014 via the J533 gateway to all buses."
+  - m2_hardware: K-line (TJA1027)
+    bus: K-line (pin 7) @ 10.4 kbps
+    notes: Covers KWP-1281 / KWP2000 / ISO 9141.
+  - m2_hardware: LIN1/LIN2 (TJA1027)
+    bus: LIN sub-buses @ 19.2 kbps
+    notes: "Doors, sunroof, wipers, steering wheel \u2014 if tapped at the module."
+  - m2_hardware: NONE
+    bus: MOST (optical)
+    notes: "Fibre-optic \u2014 electrically invisible to any CAN tool."
+  - m2_hardware: NONE (if present)
+    bus: CAN FD (MQB Evo)
+    notes: "Out of scope if present \u2014 TJA1051 is CAN 2.0 only."
+- make: hyundai
+  full_name: Hyundai / Kia
+  buses:
+  - name: C-CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2005+
+    grade: B
+    notes: 'Chassis CAN: EMS/ECM, TCU, ESC/ABS, EPB, SCC, MDPS. Primary diagnostic + powertrain bus. Legislated OBD-II confirmed
+      live (2018 Kia Soul, responders 0x7E8-0x7EF).'
+    evidence: OEM-HYUNDAI-COMM (HiCOM manual; 2015 C-CAN DBC; bavtech-vci field test)
+  - name: M-CAN
+    obd2_pins: []
+    wire_count: 2
+    years: 2005+
+    grade: C
+    notes: "Multimedia/body CAN (171 messages in opendbc hyundai_2015_mcan.dbc). BITRATE UNCONFIRMED [?]. DLC pin exposure\
+      \ UNCONFIRMED [?] \u2014 treat as interior-only unless a per-model wiring diagram says otherwise."
+    evidence: OEM-HYUNDAI-COMM (opendbc DBC [B]; pins/rate [?])
+  - name: CAN FD (select 2021+)
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2021+ select
+    grade: C
+    notes: "Per community reports, DIAGNOSTICS STAY ON CLASSIC CAN even on CAN-FD vehicles \u2014 so M2 CAN 2.0 transceivers\
+      \ can still do OBD-II diagnostics; CAN-FD bus participation is out of scope."
+    evidence: OEM-HYUNDAI-COMM (Kia owner forum [C])
+  legacy:
+  - protocol: K-line (ISO 9141 / KWP2000)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 1991-~2010
+    grade: B
+    notes: "Hyundai/Kia NEVER used J1850. QUIRK: K-lines appear on MANY DLC pins \u2014 1,2,3,7,8,9,11,12,13 \u2014 one per\
+      \ system (engine, ABS, airbag, gearbox), not one shared line. Wire the M2 K-line to the TARGET SYSTEM pin, not just\
+      \ pin 7. KW71 (1991-2001 engine), ISO 9141 (1996-~2005), KWP2000-over-K-line (1996+, all systems)."
+    evidence: OEM-HYUNDAI-COMM (HiCOM manual [B])
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: C-CAN (6/14) @ 500 kbps
+    notes: Primary diagnostic + powertrain bus. Standard M2RET/ELM path.
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: M-CAN (if tapped)
+    notes: Interior-only per available sources; tap at the module if needed.
+  - m2_hardware: K-line (TJA1027)
+    bus: K-line @ 10.4 kbps
+    notes: "Pre-CAN models. Identify the target SYSTEM pin (1,2,3,7,8,9,11,12,13) \u2014 not just pin 7."
+  - m2_hardware: NONE
+    bus: J1850 VPW/PWM
+    notes: "Not applicable \u2014 Hyundai/Kia never used J1850."
+  - m2_hardware: NONE
+    bus: CAN FD (2021+ select)
+    notes: Out of scope for bus participation; diagnostics reportedly remain on classic CAN.
+- make: nissan
+  full_name: Nissan / Infiniti
+  buses:
+  - name: Main CAN (V-CAN)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: ~2003+
+    grade: B
+    notes: "Powertrain, chassis, body, diagnostics. Two 120-ohm terminators (ECM + IPDM/TCM/BCM); ~60 ohms across 6/14 = healthy\
+      \ [A]. BITRATE CONFLICT: Nissan Tech News claims 1 Mbit/s [A] vs all community captures at 500 kbps [B] \u2014 the 1\
+      \ Mbit/s figure is likely a trade-article error. Most Nissans have a single major CAN bus (6-12 devices)."
+    evidence: OEM-NISSAN-TSB (pins, terminators, 60-ohm check [A]); OEM-NISSAN-COMM (500 kbps captures [B])
+  - name: AV-CAN (infotainment)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: model-dependent
+    grade: B
+    notes: Infotainment traffic on models that expose it (e.g. Leaf).
+    evidence: OEM-NISSAN-COMM (Leaf OBD manual)
+  - name: AV COMM (audio-NAVI, isolated)
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: model-dependent
+    grade: B
+    notes: Audio unit to NAVI unit (NAVI = bus master). Not on the DLC.
+    evidence: OEM-NISSAN-COMM (Qashqai J10 capture)
+  legacy:
+  - protocol: DDL / Consult I
+    bitrate_kbps: 9.6
+    obd2_pins: []
+    years: 1989-~2004
+    grade: B
+    notes: 'Nissan-PROPRIETARY 3-wire serial: TX, RX, host-generated 153.6 kHz async clock. Host TX = 12V idle-LOW; ECU =
+      open-collector idle-HIGH (host 5V pull-up). 9600 8N1 LSB-first. Init: FF FF EF -> 0x10 (send twice if needed). Commands:
+      0xD1 read DTCs, 0xC1 clear, 0x5A stream, 0xC9 read ROM. 14-pin gray connector (~1989-2000); 1996+ 16-pin DLC carries
+      Consult Rx/Tx/Clk lines (exact DLC pin numbers UNCONFIRMED [?]) alongside K-line. ELM327/STN CANNOT speak DDL.'
+    evidence: OEM-NISSAN-DDL (Consult spec Issue 7; cansult implementation)
+  - protocol: K-line (ISO 9141)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 1996-2004
+    grade: B
+    notes: Nissan's OBD2-compliance path during the transition era (DDL is not OBD2-compliant). Factory ECU pinout labels
+      it for GST (generic scan tool) use.
+    evidence: OEM-NISSAN-COMM (1996 Altima factory ECU pinout [A])
+  m2_mapping:
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: Main CAN (6/14) @ 500 kbps
+    notes: "Standard ISO 15765-4. Note: on BCM-gatewayed models (e.g. 2018 Pathfinder) the DLC is QUERY-ONLY \u2014 passive\
+      \ sniffing sees zero frames; send an active request first."
+  - m2_hardware: CAN0 / CAN1 (TJA1051)
+    bus: AV-CAN (3/11) @ 500 kbps
+    notes: Second controller covers it where exposed (Leaf-class).
+  - m2_hardware: K-line (TJA1027)
+    bus: K-line (pin 7) @ 10.4 kbps
+    notes: 1996-2004 transition era.
+  - m2_hardware: CUSTOM (12VIO + GPIO + PWM clock)
+    bus: DDL / Consult I
+    notes: "Electrically reachable (12VIO drives 12V idle-low TX; GPIO+divider reads 5V ECU output; SAM3X PWM generates the\
+      \ 153.6 kHz clock) but needs a purpose-written DDL driver \u2014 NOT stock-firmware capable. Bench-test against a real\
+      \ ECU first. [C - untested inference]"
+  - m2_hardware: NONE
+    bus: J1850 / SWCAN
+    notes: No evidence Nissan ever used J1850 or single-wire CAN [?].
+- make: subaru
+  full_name: Subaru
+  buses:
+  - name: HS CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2008+
+    grade: A
+    notes: 'Primary diagnostic bus. 120-ohm end termination (U1201 FSM procedure confirms: fit 120 ohms
+      across CAN-Hi/Lo when ECM or VDC module is disconnected).'
+    evidence: 'OEM-SUBARU-FSM (2011 Legacy FSM DLC page: pin 6 = CAN Hi, 14 = CAN Lo)'
+  - name: CAN-LS (low-speed CAN)
+    bitrate_kbps: 250
+    obd2_pins: []
+    wire_count: 2
+    years: 2008+
+    grade: C
+    notes: "Separate body/comfort network; U1321 'CAN-LS METER NO-RECEIVE DATA' confirms it exists. Bitrate\
+      \ and DLC presence NOT documented \u2014 interior only unless proven otherwise. BIU gateway function\
+      \ HS<->LS is INFERRED, not verified."
+    evidence: OEM-SUBARU-FSM (U1321 in 2011 Impreza FSM LAN-diag table)
+  legacy:
+  - protocol: SSM2 (Subaru Select Monitor, K-line)
+    bitrate_kbps: 4.8
+    obd2_pins:
+    - 7
+    years: 1999-~2015
+    grade: B
+    notes: 'Proprietary memory-address-oriented protocol (not UDS): 4800 bps 8N1, packet 0x80 DEST SRC
+      LEN CMD data CHECKSUM; dest 0x10 = ECM, 0x18 = TCU. Commands 0xA0 block read, 0xA8 address read,
+      0xBF ECU init. Lives on pin 7 even on CAN-era cars.'
+    evidence: OEM-SUBARU-SSM (RomRaider SsmProtocol doc); OEM-SUBARU-COMM (FreeSSM docs)
+  - protocol: ISO 9141-2 (generic OBD-II)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 1999-2007
+    grade: B
+    notes: Emissions OBD-II on the K-line for EJ-era cars; SSM2 shares the same pin with its own protocol.
+    evidence: 'OEM-SUBARU-COMM (FreeSSM docs: SSM2 is KWP2000-derived on ISO-9141/14230 layer)'
+  m2_mapping:
+  - m2_hardware: CAN0 or CAN1 (TJA1051, due_can)
+    bus: HS CAN (6/14)
+    notes: Primary diagnostic + logging bus, all platforms 2008+.
+  - m2_hardware: K-line transceiver (TJA1027)
+    bus: SSM2 on pin 7
+    notes: "4800 bps 8N1 is within the TJA1027's capability; the work is the SSM2 packet layer (init 0xBF,\
+      \ address reads 0xA8, checksum). Covers 1999-~2015 ECM/TCU including CAN-era cars \u2014 two independent\
+      \ diagnostic paths from the DLC alone."
+  - m2_hardware: Second CAN controller (TJA1051)
+    bus: CAN-LS (interior tap)
+    notes: Only if tapped behind the BIU (combination-meter branch); bitrate undocumented, verify per
+      car.
+- make: mazda
+  full_name: Mazda
+  buses:
+  - name: HS-CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2001+ (SkyActiv 2012+)
+    grade: B
+    notes: 'Powertrain/chassis: PCM, TCM, DSC/ABS HU/CM, SAS (airbag), IC.'
+    evidence: OEM-MAZDA-COMM (Mazda Vehicle Networks training doc; berumiya 6th-gen DBC project)
+  - name: MS-CAN
+    bitrate_kbps: 125
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: 2001+
+    grade: B
+    notes: "Body/comfort: FBCM/RBCM, HVAC, audio, TPMS, RKE. EXPOSED AT THE DLC (pins 3/11) \u2014 the\
+      \ M2's two CAN controllers can watch HS+MS simultaneously straight from the OBD port, unlike Toyota."
+    evidence: OEM-MAZDA-COMM (Mazda training doc; FORScan Mazda coverage)
+  legacy:
+  - protocol: SCP (SAE J1850 PWM, Ford era)
+    bitrate_kbps: 41.6
+    obd2_pins:
+    - 2
+    - 10
+    years: ~2001-2012
+    grade: B
+    notes: "Ford-platform-era diagnostics; pin 13 FLASH line signals the PCM to erase EPROM during programming\
+      \ \u2014 never drive it from the M2."
+    evidence: OEM-MAZDA-COMM (Mazda training doc DLC table)
+  - protocol: ISO 9141 K-line
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: Ford era
+    grade: B
+    notes: On some Ford-era models.
+    evidence: OEM-MAZDA-COMM (Mazda training doc)
+  m2_mapping:
+  - m2_hardware: CAN0 or CAN1 (TJA1051, due_can)
+    bus: HS-CAN (6/14)
+    notes: Primary diagnostic + logging bus.
+  - m2_hardware: Second CAN controller (TJA1051)
+    bus: MS-CAN (3/11)
+    notes: "Exposed at the DLC \u2014 no gateway traversal needed."
+  - m2_hardware: M2 J1850 hardware (discrete circuit, pins 49-54)
+    bus: SCP J1850 PWM (2/10)
+    notes: Ford-era models only (pre-~2008).
+  - m2_hardware: K-line transceiver (TJA1027)
+    bus: K-line (7)
+    notes: Ford-era non-CAN modules.
+  - m2_hardware: None
+    bus: 7th-gen BP/CX-30 / 2024+ ND3 buses
+    notes: "OUT OF M2 SCOPE IF CAN FD \u2014 unverified, treat as unknown [?]."
+- make: bmw
+  full_name: BMW
+  buses:
+  - name: D-CAN (diagnostic CAN)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 03/2007+ E-series; F-series
+    grade: B
+    notes: Diagnostic bus to the DLC (replaced K-line 03/2007). E-series diagnostics are KWP2000-over-CAN
+      on the 0x6F1/0x6XX scheme, not UDS DIDs.
+    evidence: OEM-BMW-COMM (bimmerforums E90 CAN project; cable-vendor model tables)
+  - name: PT-CAN (powertrain CAN)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 3
+    years: E-series
+    grade: A
+    notes: "DME/DDE, EGS, DSC, EKPS; JBE as gateway. Three wires: CAN-H/CAN-L twisted pair PLUS a separate\
+      \ wake-up line (not CAN signaling \u2014 never connect to a transceiver). 120-ohm terminators. DLC\
+      \ presence is model-dependent (absent pre-03/2007)."
+    evidence: OEM-BMW-TRAIN (ST401 Body Electronics II)
+  - name: K-CAN (body CAN)
+    bitrate_kbps: 100
+    obd2_pins: []
+    wire_count: 2
+    years: E-series
+    grade: A
+    notes: "Body/comfort: CAS, FRM, KOMBI, IHKA, MRS, FZD, CCC, PDC. NOT on the DLC \u2014 tap behind\
+      \ the JBE. Reported as fault-tolerant-style; TJA1051 compatibility on a tap is UNVERIFIED."
+    evidence: OEM-BMW-TRAIN (ST401); OEM-BMW-COMM (K-CAN fault-tolerant report [C])
+  - name: K-CAN2
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: F-series
+    grade: B
+    notes: REM, FZD, PMA, FLA, FEM-internal ZGW, HU-H (NBT). Not on DLC.
+    evidence: OEM-BMW-TRAIN (F30 Complete Vehicle training); OEM-BMW-COMM (superwofy E9X project)
+  - name: F-CAN (chassis CAN)
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: E-series
+    grade: B
+    notes: DSC <-> SZL <-> active steering (AL). Direct tap at DSC/SZL.
+    evidence: OEM-BMW-TRAIN (ST401)
+  - name: Ethernet / ENET / DoIP
+    obd2_pins:
+    - 3
+    - 11
+    - 12
+    - 13
+    wire_count: 8
+    years: F-series; G-series
+    grade: B
+    notes: "100BASE-TX on OBD 3=TX+, 11=TX-, 12=RX+, 13=RX-. F/G-series coding and diagnostics. OUT OF\
+      \ M2 SCOPE \u2014 needs Ethernet MAC + DoIP stack."
+    evidence: OEM-BMW-COMM (beemuu ENET pinout; team-bhp DIY thread)
+  legacy:
+  - protocol: K-line
+    obd2_pins:
+    - 7
+    years: pre-03/2007 E-series
+    grade: C
+    notes: Pre-D-CAN diagnostics; the K+DCAN cable switch selects between K-line and D-CAN.
+    evidence: OEM-BMW-COMM (cable-vendor model tables)
+  - protocol: MOST (fiber-optic ring)
+    years: E/F-series
+    grade: B
+    notes: "Infotainment ring (CCC/CIC, amp, TCU). Fiber \u2014 no copper tap. OUT OF M2 SCOPE."
+    evidence: 'OEM-BMW-TRAIN (ST401: 22.5 Mbit/s E-series)'
+  - protocol: byteflight (fiber star)
+    years: E60/E63/E64/E65
+    grade: B
+    notes: Safety bus, 10 Mbit/s over fiber. OUT OF M2 SCOPE.
+    evidence: OEM-BMW-TRAIN (ST401)
+  - protocol: FlexRay
+    years: F-series
+    grade: B
+    notes: "Chassis dynamics (DSC, ICM, VDM, EPS). 10 Mbit/s. OUT OF M2 SCOPE \u2014 no M2 hardware."
+    evidence: OEM-BMW-TRAIN (F30 training)
+  m2_mapping:
+  - m2_hardware: CAN0 or CAN1 (TJA1051, due_can)
+    bus: D-CAN (6/14)
+    notes: Primary diagnostic + logging path. E-series 0x6F1 KWP2000-over-CAN is implementable in the
+      M2's UDS/diagnostics mode (11-bit IDs, 8-byte frames, fully CAN 2.0).
+  - m2_hardware: Second CAN controller (TJA1051)
+    bus: PT-CAN / K-CAN2 / F-CAN (direct taps)
+    notes: Harness taps only; K-CAN tap needs transceiver-compatibility verification first [C].
+  - m2_hardware: None
+    bus: MOST / byteflight / FlexRay / Ethernet-DoIP / CAN FD (G-series)
+    notes: "OUT OF M2 SCOPE \u2014 no hardware path."
+- make: mercedes
+  full_name: Mercedes-Benz
+  buses:
+  - name: CAN-C (powertrain CAN)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2000+
+    grade: A
+    notes: Engine, transmission, ESP, chassis. The DLC exposes the 500k CAN on standard pins 6/14.
+    evidence: OEM-MERCEDES-DOC (Daimler GF54.21-P-4170GZ); OEM-MERCEDES-COMM (Racelogic W212 CAN doc [B])
+  - name: CAN-B (interior CAN)
+    bitrate_kbps: 83.3
+    obd2_pins: []
+    wire_count: 2
+    years: 2000+
+    grade: A
+    notes: "Body/comfort: SAMs, doors, seats, HVAC. Behind the gateway; tap at X30/4-7 distribution hubs\
+      \ in footwells/rocker panels. Odd 83.3k rate is real \u2014 confirmed by open-source W203 CAN project."
+    evidence: OEM-MERCEDES-DOC (Daimler GF54.21-P-4170GZ); OEM-MERCEDES-COMM (c180kompressor W203 project
+      [B])
+  - name: CAN-D (diagnostic CAN)
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: W211 era
+    grade: A
+    notes: 'Dedicated diagnostic databus: CGW <-> tester link. Tester path, not raw bus traffic.'
+    evidence: OEM-MERCEDES-DOC (W211 networking training)
+  - name: CAN-E (cluster/infotainment link)
+    bitrate_kbps: 500
+    obd2_pins: []
+    wire_count: 2
+    years: W204/W212 era
+    grade: C
+    notes: Cluster link behind the cluster (W204 cluster connector pins 12/13). Not on DLC.
+    evidence: OEM-MERCEDES-COMM (ABRITUS72 pinouts [B/C]; W204 cluster bench project [C])
+  - name: Ethernet / DoIP
+    obd2_pins:
+    - 3
+    - 11
+    - 12
+    - 13
+    wire_count: 8
+    years: W222/W205 era+
+    grade: B
+    notes: Diagnostics on newer models; DLC pins 3/11 (Rx), 12/13 (Tx), pin 8 activation (ISO 13400 option
+      1). OUT OF M2 SCOPE.
+    evidence: OEM-MERCEDES-COMM (autopi-io DoIP guide; Vector VN8810 manual [B])
+  legacy:
+  - protocol: KWP2000 over CAN (0x4xx/0x5xx diagnostic IDs)
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    years: W203/W211 era (~2000-2009)
+    grade: C
+    notes: Tester request 0x04E0 -> response 0x05FF observed in an XENTRY-passthru capture (Macchina M2
+      under-dash). Not the 0x7xx block.
+    evidence: OEM-MERCEDES-COMM (mercedes-hacking-docs Ch. 3 [C])
+  - protocol: K-line
+    obd2_pins:
+    - 7
+    years: pre-W203
+    grade: C
+    notes: Older (ME9.7-era) DLCs carried multiple K-lines on pins 1/7/9/11/12/13/15.
+    evidence: OEM-MERCEDES-COMM (blog.xhorsetool.com ECU-bench pinout [C])
+  - protocol: MOST (fiber-optic)
+    years: 2000+
+    grade: B
+    notes: "Audio/infotainment (replaces D2B). Fiber \u2014 OUT OF M2 SCOPE."
+    evidence: OEM-MERCEDES-DOC (W211 training)
+  m2_mapping:
+  - m2_hardware: CAN0 or CAN1 (TJA1051, due_can)
+    bus: CAN-C / diagnostic CAN (6/14)
+    notes: "Legislated OBD-II + gateway-filtered diagnostics. THE DLC IS FILTERED: reads pass, writes\
+      \ are restricted to diagnostic CAN IDs, unknown diagnostic IDs are silently dropped \u2014 non-response\
+      \ means 'filtered', not 'module absent'. Wake-up frame required before buses carry traffic."
+  - m2_hardware: Second CAN controller (TJA1051)
+    bus: CAN-B (83.3k, X30 hub tap)
+    notes: TJA1051 handles 83.3k. Interior/body traffic behind the gateway.
+  - m2_hardware: K-line transceiver (TJA1027)
+    bus: K-line (older models)
+    notes: Pre-W203 modules.
+  - m2_hardware: None
+    bus: MOST / FlexRay / Ethernet-DoIP / 2021+ secure gateway
+    notes: "OUT OF M2 SCOPE. 2021+ (W223/W206) secure gateway authenticates OBD-II access \u2014 unauthenticated\
+      \ reads blocked."
+- make: volvo
+  full_name: Volvo
+  buses:
+  - name: HS-CAN
+    bitrate_kbps: 500
+    obd2_pins:
+    - 6
+    - 14
+    wire_count: 2
+    years: 2005+ (250k in 2004)
+    grade: B
+    notes: 'Powertrain/chassis: ECM, TCM, BCM/ABS, ETM, SAS. CEM acts as inter-bus gateway. Terminators
+      in ABS/BCM + ETM (Bosch EMS MY02+: BCM + ECM).'
+    evidence: OEM-VOLVO-VADIS (CAN-bus diagnostics overview); OEM-VOLVO-COMM (2005 S60R harness pinout
+      [C])
+  - name: LS/MS-CAN
+    bitrate_kbps: 250
+    obd2_pins:
+    - 3
+    - 11
+    wire_count: 2
+    years: 2005+ (125k in 2004)
+    grade: B
+    notes: "Body/comfort: SRS, DDM, PDM, PSM, CCM, DIM, RTI, PHM, AUD, REM, SWM, UEM. AT THE DLC on P1/P2/P3\
+      \ \u2014 MS-CAN-capable adapter is mandatory for full third-party coverage. Terminators in UEM +\
+      \ REM."
+    evidence: OEM-VOLVO-VADIS; OEM-VOLVO-COMM (ioterminal bench docs [B]; V-Tool adapter page [B])
+  legacy:
+  - protocol: ISO 9141-2 (K-line)
+    bitrate_kbps: 10.4
+    obd2_pins:
+    - 7
+    years: 1996-2004
+    grade: B
+    notes: "2005+ = CAN. Pins 2/10 are NOT populated on Volvo \u2014 Volvo never shipped J1850 despite\
+      \ generic pinout tables."
+    evidence: OEM-VOLVO-COMM (Volvo OBD-II pinout doc [B])
+  m2_mapping:
+  - m2_hardware: CAN0 or CAN1 (TJA1051, due_can)
+    bus: HS-CAN (6/14)
+    notes: 'Primary powertrain/chassis bus. Community proof: Alfaa123/Volvo-CAN-Gauge ran on a Macchina
+      M2 against a 2011 C30 (P1).'
+  - m2_hardware: Second CAN controller (TJA1051)
+    bus: LS/MS-CAN (3/11)
+    notes: "BOTH DLC CAN pairs are usable simultaneously \u2014 the M2's dual CAN controllers map 1:1\
+      \ onto Volvo's dual-bus DLC. Note the model-year bitrate split ('04: 125k/250k; '05+: 250k/500k)."
+  - m2_hardware: K-line transceiver (TJA1027)
+    bus: K-line (7)
+    notes: 1996-2004 models.
+  - m2_hardware: None
+    bus: SPA/CMA (2016+) Ethernet-DoIP / CAN FD
+    notes: "OUT OF M2 SCOPE \u2014 no Ethernet/DoIP hardware, TJA1051 is CAN 2.0 only. SPA/CMA need a\
+      \ VOE adapter + VIDA."

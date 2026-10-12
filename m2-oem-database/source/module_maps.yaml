@@ -1,0 +1,914 @@
+entries:
+- dbc: gm_global_a_chassis
+  platform: "GM Global A \u2014 chassis bus"
+  make: gm
+  bus: HS GMLAN (Chassis Expansion), 500 kbps, pins 6/14
+  modules:
+  - node: K182_PACM
+    name: Park Assist Control Module
+  - node: K43_PSCM
+    name: Power Steering Control Module
+  - node: K17_EBCM
+    name: Electronic Brake Control Module
+  - node: K124_ASCM
+    name: Active Safety Control Module
+  missing:
+  - ECM
+  - TCM
+  - BCM
+  - "electronic suspension (ESC) \u2014 not in this DBC"
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names match GM chassis-module naming (K-series designators);\
+    \ GM service doc lists EBCM on HS GMLAN [A]"
+- dbc: gm_global_a_high_voltage_management
+  platform: "GM Global A \u2014 high-voltage (hybrid/EV) bus"
+  make: gm
+  bus: HS GMLAN, 500 kbps, pins 6/14 (hybrid high-voltage segment)
+  modules:
+  - node: K16_BECM
+    name: Battery Energy Control Module
+  - node: K114B_HPCM
+    name: Hybrid Powertrain Control Module
+  - node: T18_BatteryCharger
+    name: onboard charger
+  missing:
+  - ECM
+  - APM (in powertrain_expansion DBC)
+  - contactor controllers
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names + message set (Battery_Module_1-4, Pack_Stats, Charger_stats,\
+    \ Battery_temp) corroborate a battery-management segment"
+- dbc: gm_global_a_lowspeed
+  platform: "GM Global A \u2014 low-speed bus"
+  make: gm
+  bus: SW GMLAN (single-wire), 33.33 kbps, pin 1
+  modules: []
+  missing:
+  - BCM itself
+  - HVAC
+  - radio
+  - instrument cluster
+  - "seat modules \u2014 none appear as named nodes"
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message content is body/comfort traffic consistent with SWCAN; GM\
+    \ brief places body modules on SW GMLAN pin 1 [B]"
+- dbc: gm_global_a_lowspeed_1818125
+  platform: "GM Global A \u2014 low-speed bus (extended capture)"
+  make: gm
+  bus: SW GMLAN (single-wire), 33.33 kbps, pin 1
+  modules:
+  - node: "367 messages of body/comfort traffic (ODI center-stack/BCM exchanges, climate requests, seat\
+      \ settings, lighting customization, lane-keeping) \u2014 BCM and center-stack/infotainment nodes\
+      \ dominate"
+  missing:
+  - named module nodes (BU_ is placeholder XXX)
+  - individual module attribution is inference from message names [C]
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message-name content (ODI_BCM_2_CenterStack, AMM lighting, heated-windshield\
+    \ requests) matches SWCAN body traffic [B]"
+- dbc: gm_global_a_object
+  platform: "GM Global A \u2014 object/ADAS bus"
+  make: gm
+  bus: "ADAS object bus (likely Chassis Expansion HS segment), 500 kbps \u2014 bus assignment inferred\
+    \ [C]"
+  modules: []
+  missing:
+  - "everything powertrain/chassis/body \u2014 this DBC is ADAS-only"
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names alone; no factory topology found for the object bus.\
+    \ Sender counts (VIS2_FO 22, LRR 20 msgs) corroborate a camera+radar fusion segment"
+- dbc: gm_global_a_powertrain_expansion
+  platform: "GM Global A \u2014 powertrain expansion bus"
+  make: gm
+  bus: "HS GMLAN (Powertrain Expansion), 500 kbps \u2014 inferred [C]"
+  modules:
+  - node: K1_APM
+    name: "Accessory Power Module) \u2014 APM_Stats / APM_Command"
+  missing:
+  - ECM
+  - "TCM \u2014 the actual powertrain controllers are not in this DBC ---"
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC contains only the APM node; \"powertrain expansion\" is the DBC\
+    \ filename's claim, corroborated by the GM brief's HS-variant list [B]"
+- dbc: ford_cgea1_2_ptcan_2011
+  platform: "Ford CGEA 1.2 \u2014 powertrain CAN"
+  make: ford
+  bus: HS-CAN, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - BCM/GWM
+  - APIM
+  - instrument cluster
+  - "RCM \u2014 not in this DBC"
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message content matches the Ford brief's HS-CAN module list (PCM,\
+    \ TCM, ABS, EPAS) [B]"
+- dbc: ford_cgea1_2_bodycan_2011
+  platform: "Ford CGEA 1.2 \u2014 body CAN"
+  make: ford
+  bus: MS-CAN, 125 kbps, pins 3/11
+  modules: []
+  missing:
+  - instrument cluster
+  - RCM
+  - KVM
+  - "PAM \u2014 named in brief"
+  - absent here
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message content matches the Ford brief's MS-CAN module list (GEM/BCM,\
+    \ door modules, EATC) [B]"
+- dbc: ford_fusion_2018_pt
+  platform: "Ford Fusion 2018 \u2014 powertrain CAN"
+  make: ford
+  bus: HS-CAN, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - PCM
+  - TCM as named nodes
+  - APIM
+  - IPC
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 14-message subset consistent with HS-CAN powertrain traffic [B]"
+- dbc: ford_fusion_2018_adas
+  platform: "Ford Fusion 2018 \u2014 ADAS bus"
+  make: ford
+  bus: "ADAS/private bus (not DLC-exposed) \u2014 inferred [C]"
+  modules:
+  - node: "object-tracking nodes (Object_00 \u2026 Object_13+) \u2014 radar/camera fusion output only"
+  missing:
+  - IPMA
+  - radar module
+  - "PSCM \u2014 the actual ADAS ECUs"
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC contains only object-track messages; no module nodes named"
+- dbc: ford_lincoln_base_pt
+  platform: "Ford/Lincoln base \u2014 powertrain CAN (shared base DBC)"
+  make: ford
+  bus: "HS-CAN, 500 kbps, pins 6/14 (opendbc maps this DBC to Bus.pt for current Ford platforms incl.\
+    \ CAN-FD ones \u2014 but the DBC itself is classic-CAN format)"
+  modules: []
+  missing:
+  - BCM/BdyCM
+  - APIM
+  - IPC
+  - RCM
+  - "SCCM \u2014 named in brief"
+  - absent here
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names corroborated by the Ford brief's module/ID list (GWM\
+    \ 0x726, PCM 0x7E0) and openpilot's Ford platform mapping [B]"
+- dbc: ford_cads
+  platform: Ford CADS (older driver-assist)
+  make: ford
+  bus: "radar private bus (MRR direct) \u2014 inferred [C]"
+  modules: &id001
+  - node: MRR
+    name: "Medium-Range Radar) only \u2014 status, header, XCP DAQ messages; 64-bit variant in FORD_CADS_64"
+  missing: &id002
+  - "everything else \u2014 single-sensor DBC"
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node list contains only MRR; message set is radar-internal (XCP\
+    \ calibration protocol)"
+- dbc: ford_cads_64
+  platform: Ford CADS (older driver-assist)
+  make: ford
+  bus: "radar private bus (MRR direct) \u2014 inferred [C]"
+  modules: *id001
+  missing: *id002
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node list contains only MRR; message set is radar-internal (XCP\
+    \ calibration protocol)"
+- dbc: chrysler_cusw
+  platform: "Chrysler CUSW (Compact US Wide \u2014 Dart, 200, Cherokee KL)"
+  make: stellantis
+  bus: CAN-C, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - PCM
+  - TCM
+  - BCM
+  - ORC
+  - SGW as named nodes
+  - CAN-IHS side absent
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message content matches CAN-C powertrain/chassis profile; Stellantis\
+    \ brief places EPS/ABS/PCM/TCM/BCM on CAN-C [B]"
+- dbc: chrysler_pacifica_2017_hybrid_private_fusion
+  platform: "Chrysler Pacifica 2017 Hybrid \u2014 private fusion bus"
+  make: stellantis
+  bus: "private/internal bus behind the gateway (NOT DLC-exposed) \u2014 inferred [C]"
+  modules:
+  - node: "unknown \u2014 message names are opaque (a_1, b_1, unknown_200); 31 messages, none decoded\
+      \ to a module"
+  missing:
+  - "effectively everything \u2014 this DBC is an undecoded private-bus capture"
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 filename's \"private_fusion\" claim only; consistent with the Stellantis\
+    \ brief's private-CAN concept (gateway-internal buses) [B]"
+- dbc: fca_giorgio
+  platform: FCA Giorgio (Alfa Romeo Giulia/Stelvio)
+  make: stellantis
+  bus: CAN-C powertrain, 500 kbps (DBC content); platform also has 125 kbps CAN-IHS per community RE [C]
+  modules: []
+  missing:
+  - BCM
+  - SGW
+  - TCM
+  - "body/IHS modules \u2014 IHS side not captured ---"
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message names match CAN-C profile; Giulia sim-racing project documents\
+    \ the dual-bus layout (500k powertrain + 125k IHS) [C], consistent with the Stellantis brief's CAN-C/CAN-IHS\
+    \ split [B]"
+- dbc: toyota_2017_ref_pt
+  platform: "Toyota 2017 reference \u2014 powertrain CAN (V Bus)"
+  make: toyota
+  bus: CAN V Bus (HS), 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - ECM
+  - skid control ECU
+  - main body ECU
+  - "combination meter as named senders \u2014 the DBC is gateway/ADAS-weighted"
+  - BEAN/AVC-LAN absent entirely (no M2-reachable path in any case)
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names + Toyota repair-manual CAN V Bus member list (ECM,\
+    \ airbag, skid control, EPS, gateway ECU, DLC3) [B]; CGW dominance matches the gateway-ECU architecture\
+    \ in the Toyota brief [B]"
+- dbc: toyota_prius_2010_pt
+  platform: "Toyota Prius 2010 \u2014 powertrain CAN (hybrid)"
+  make: toyota
+  bus: CAN V Bus (HS), 500 kbps, pins 6/14
+  modules:
+  - node: DSU
+    name: Driving Support Unit
+  - node: HCU
+    name: Hybrid Control Unit
+  - node: 'EPS, IPAS (Intelligent Parking Assist); message content: brake module, wheel speeds, gas pedal,
+      steer torque, pre-collision'
+  missing:
+  - ECM
+  - HV battery ECU as named nodes (0x7E2/0x7E3 diagnostic IDs from the brief have no DBC counterpart here)
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 node names match Prius hybrid topology (HV ECU, HV battery on the\
+    \ HS bus per the Toyota brief) [B]"
+- dbc: toyota_adas
+  platform: "Toyota ADAS (TSS / TSS 2.0) \u2014 camera bus"
+  make: toyota
+  bus: "ADAS camera private bus (not DLC-exposed) \u2014 inferred [C]"
+  modules: &id003
+  - node: "forward-camera object tracking (TRACK_A_0 \u2026 A_12, STATUS_MSG"
+  missing: &id004
+  - the camera ECU itself
+  - radar
+  - DSU
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC contains only object-track messages; no module nodes"
+- dbc: toyota_tss2_adas
+  platform: "Toyota ADAS (TSS / TSS 2.0) \u2014 camera bus"
+  make: toyota
+  bus: "ADAS camera private bus (not DLC-exposed) \u2014 inferred [C]"
+  modules: *id003
+  missing: *id004
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 DBC contains only object-track messages; no module nodes"
+- dbc: toyota_radar_dsu_tssp
+  platform: "Toyota TSS-P \u2014 radar/DSU bus"
+  make: toyota
+  bus: "radar private bus (not DLC-exposed) \u2014 inferred [C]"
+  modules:
+  - node: "RADAR node + DSU (Driving Support Unit); OBJECT_0 \u2026 OBJECT_11, steering buttons, cluster\
+      \ display messages"
+  missing:
+  - millimeter-wave radar ECU details
+  - skid control ECU
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 BU_ lists RADAR; consistent with the Toyota brief's radar\u2192DSU\u2192\
+    powertrain forwarding topology [C]"
+- dbc: toyota_iq_2009_can
+  platform: "Toyota iQ 2009 \u2014 CAN"
+  make: toyota
+  bus: "CAN V Bus (HS), 500 kbps \u2014 inferred [C]"
+  modules: []
+  missing:
+  - gateway ECU
+  - body modules ---
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 message content only; no named module nodes"
+- dbc: acura_ilx_2016_nidec
+  platform: "Acura ILX 2016 \u2014 F-CAN (Nidec ADAS)"
+  make: honda
+  bus: F-CAN, 500 kbps, pins 6/14
+  modules:
+  - node: 'ADAS, RADAR (Nidec radar unit); message content: vehicle state, radar diagnostics'
+  missing:
+  - ECM
+  - VSA modulator
+  - EPS
+  - "gauge module \u2014 the actual F-CAN powertrain nodes"
+  - B-CAN (MICU
+  - climate
+  - immobilizer) entirely absent (never at the DLC per the brief) ---
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 Honda brief documents F-CAN at 500 kbps on 6/14 [A/B]; openpilot's\
+    \ hondacan.py confirms the F-CAN ADAS layout [B]"
+- dbc: vw_mqb
+  platform: "VW MQB \u2014 gateway-forwarded CAN"
+  make: vw
+  bus: diagnosis/powertrain CAN via J533 gateway, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - comfort/infotainment modules (gateway-internal per the brief)
+  - ABS/ESP as named senders is thin
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 node names match the VW brief's MQB topology (all buses 500k, J533\
+    \ gateway at 0x19) [B]; gateway dominance matches the \"diagnosis CAN to J533\" DLC model [B]"
+- dbc: vw_mlb
+  platform: "VW MLB (Audi longitudinal) \u2014 gateway-forwarded CAN"
+  make: vw
+  bus: diagnosis/powertrain CAN via gateway, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - comfort/infotainment (gateway-internal)
+  - instrument cluster
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names corroborate the MLB gateway topology [B]"
+- dbc: vw_mqbevo
+  platform: "VW MQB Evo \u2014 gateway-forwarded CAN"
+  make: vw
+  bus: "diagnosis CAN via gateway, 500 kbps, pins 6/14 (CAN FD on MQB Evo unconfirmed \u2014 this DBC\
+    \ is classic-CAN format)"
+  modules: []
+  missing:
+  - gateway node itself as named sender
+  - comfort/infotainment
+  - SFD-protected modules' write paths (out of scope for a DBC)
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message names match MQB Evo module set; SFD-era platform per the VW\
+    \ brief [B]"
+- dbc: vw_pq
+  platform: "VW PQ (PQ25/35/46) \u2014 CAN"
+  make: vw
+  bus: "powertrain/diagnosis CAN, 500 kbps, pins 6/14 (convenience CAN was 100k on PQ per SSP287 \u2014\
+    \ this DBC's content reads as powertrain-side)"
+  modules: []
+  missing:
+  - J533 gateway
+  - Motor/Getriebe as named nodes
+  - convenience-CAN (100k) side not separated in this DBC ---
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 German message names only; bus assignment inferred from content mix\
+    \ [C]"
+- dbc: hyundai_2015_ccan
+  platform: "Hyundai 2015 \u2014 C-CAN (chassis)"
+  make: hyundai
+  bus: C-CAN, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - SMK (smart key) as a sender
+  - CGW gateway node present in BU_ list but sends nothing in this capture
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names corroborated by the public 2015 Hyundai C-CAN DBC node\
+    \ documentation (EMS/TCU/ESC/IBOX/SMK/SCC) [B]; matches the Hyundai brief's C-CAN description [B]"
+- dbc: hyundai_2015_mcan
+  platform: "Hyundai 2015 \u2014 M-CAN (multimedia/body)"
+  make: hyundai
+  bus: "M-CAN \u2014 bitrate and DLC exposure UNCONFIRMED [?] (treated as interior-only per the Hyundai\
+    \ brief)"
+  modules:
+  - node: HU_TMU
+    name: head unit / telematics
+  - node: AMP
+    name: amplifier
+  - node: MON
+    name: monitor/display
+  - node: SWRC
+    name: steering-wheel remote
+  - node: CLOCK, HUD, DATC, CCP, IBOX, CLU, CGW, AVM, plus RSE (rear-seat entertainment
+  - node: IPM, KBD
+  missing:
+  - exact gateway routing between C-CAN and M-CAN
+  - M-CAN bitrate
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names are body/multimedia modules [B]; M-CAN bitrate/pins\
+    \ unconfirmed per the Hyundai brief [?]"
+- dbc: hyundai_i30_2014
+  platform: "Hyundai i30 2014 \u2014 C-CAN"
+  make: hyundai
+  bus: "C-CAN, 500 kbps, pins 6/14 \u2014 inferred [C]"
+  modules: []
+  missing:
+  - BCM
+  - TCU as named nodes
+  grade: C
+  evidence: "OEM-MODULE-MAPS \u2014 message names only; consistent with C-CAN powertrain/chassis content\
+    \ [C]"
+- dbc: hyundai_santafe_2007
+  platform: "Hyundai Santa Fe 2007 \u2014 CAN (early)"
+  make: hyundai
+  bus: "C-CAN, 500 kbps, pins 6/14 \u2014 inferred [C] (2007 is early in Hyundai's CAN rollout; 2008 was\
+    \ a transition year per the brief)"
+  modules:
+  - node: ECU, TCU, ESP, SAS (steering-angle sensor
+  - node: ABS, AWD
+  missing:
+  - BCM
+  - airbag
+  - cluster ---
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 DBC node names are the classic early-CAN module set [B]"
+- dbc: nissan_xterra_2011
+  platform: "Nissan Xterra 2011 \u2014 main CAN"
+  make: nissan
+  bus: main CAN, 500 kbps, pins 6/14
+  modules: []
+  missing:
+  - IPDM E/R
+  - combination meter
+  - 4WD/transfer modules
+  - AV-CAN (pins 3/11) not captured
+  - "only 15 messages total \u2014 thinnest DBC in the database ---"
+  grade: B
+  evidence: "OEM-MODULE-MAPS \u2014 message names match the Nissan brief's main-CAN module set (ECM, TCM,\
+    \ ABS, BCM, IPDM) [B]"
+- dbc: bmw_e9x_e8x
+  platform: "BMW E90 3-series (2005\u20132011; E91/E92/E93 share the architecture) \u2014 PT-CAN"
+  make: bmw
+  bus: 'PT-CAN, 500 kbps (3 wires: CAN-H/CAN-L + separate wake-up line, not CAN signaling)'
+  modules:
+  - node: DME_DDE
+    name: Engine control (DME petrol / DDE diesel)
+  - node: EGS
+    name: Transmission control
+  - node: DSC
+    name: Dynamic stability control
+  - node: EKPS
+    name: Fuel pump control
+  - node: GWS
+    name: Gear selector switch
+  missing:
+  - "K-CAN body modules (CAS, FRM, KOMBI \u2014 not on PT-CAN)"
+  - F-CAN chassis nodes
+  grade: B
+  evidence: "OEM-BMW-TRAIN \u2014 ST401 Body Electronics II; OEM-BMW-COMM \u2014 opendbc bmw_e9x_e8x.dbc\
+    \ CAN-ID attribution (DME 0xAA/0xA8/0xB4\u2026, DSC 0xC8/0xCE\u2026, EGS 0xBA\u2026, SZL 0xC4\u2026\
+    ) cross-checked with bimmerforums E90 CAN project"
+- dbc: bmw_e9x_e8x
+  platform: "BMW E90 3-series (2005\u20132011) \u2014 K-CAN (body)"
+  make: bmw
+  bus: "K-CAN, 100 kbps (not on DLC \u2014 tap behind JBE; reported fault-tolerant-style, TJA1051 compatibility\
+    \ UNVERIFIED)"
+  modules:
+  - node: CAS
+    name: Car Access System
+  - node: JBE_JBBF
+    name: Junction box electronics (gateway PT<->K)
+  - node: FRM
+    name: Footwell module
+  - node: KOMBI
+    name: Instrument cluster
+  - node: IHKA
+    name: Climate control
+  - node: MRS
+    name: Airbag (multiple restraint system)
+  - node: FZD
+    name: Roof function center
+  - node: CCC_CIC
+    name: Infotainment headunit
+  - node: PDC
+    name: Park distance control
+  missing:
+  - PT-CAN powertrain modules
+  - F-CAN chassis nodes
+  - MOST ring nodes (fiber, out of scope)
+  grade: B
+  evidence: "OEM-BMW-TRAIN \u2014 ST401; BMW E90 junction-box overview (scribd)"
+- dbc: bmw_e9x_e8x
+  platform: "BMW E90 3-series (2005\u20132011) \u2014 F-CAN (chassis)"
+  make: bmw
+  bus: F-CAN, 500 kbps (direct tap at DSC/SZL)
+  modules:
+  - node: DSC
+    name: Dynamic stability control
+  - node: SZL
+    name: Steering column switch cluster
+  - node: AL
+    name: Active steering
+  missing:
+  - PT-CAN and K-CAN nodes
+  grade: B
+  evidence: "OEM-BMW-TRAIN \u2014 ST401"
+- dbc: bmw_e9x_e8x
+  platform: "BMW F30 3-series (2012\u20132018) \u2014 all CAN buses (no dedicated DBC; nearest: bmw_e9x_e8x\
+    \ E-series, NOT directly transferable)"
+  make: bmw
+  bus: PT-CAN 500k / PT-CAN2 500k / K-CAN (Body) 100k / K-CAN2 500k (none on DLC except D-CAN diagnostic
+    link)
+  modules:
+  - node: DME_DDE
+    name: Engine control
+  - node: EGS
+    name: Transmission control
+  - node: ACSM
+    name: Airbag
+  - node: EKPS
+    name: Fuel pump
+  - node: GWS
+    name: Gear selector
+  - node: REM
+    name: Rear electronics module
+  - node: FZD
+    name: Roof function center
+  - node: PMA
+    name: Parking maneuvering assistant
+  - node: FLA
+    name: High-beam assistant
+  - node: FEM_ZGW
+    name: Front electronics module with integrated central gateway ZGM (absorbs CAS/JBE/FRM)
+  - node: HU_H
+    name: Headunit high (NBT)
+  - node: IHKA
+    name: Climate control
+  missing:
+  - "FlexRay chassis nodes (DSC, ICM, VDM, EPS \u2014 out of M2 scope)"
+  - MOST ring
+  - "Ethernet nodes (HU-H, KOMBI \u2014 out of M2 scope)"
+  grade: B
+  evidence: "OEM-BMW-TRAIN \u2014 BMW F30 Complete Vehicle training (via bimmerscan.com FEM page). No\
+    \ F30 DBC in database; E-series CAN IDs do not transfer (gateway encapsulation)."
+- dbc: bmw_e9x_e8x
+  platform: "BMW G20 3-series (2019+) \u2014 gateway only (no dedicated DBC; CAN FD / DoIP \u2014 OUT\
+    \ OF M2 SCOPE)"
+  make: bmw
+  bus: "CAN FD buses + DoIP over Ethernet (OBD 3/11/12/13); K-CAN4 \u2248 F30 K-CAN2 role"
+  modules:
+  - node: BDC
+    name: "Body Domain Controller \u2014 central gateway and immobilizer (BDC3 from 2020)"
+  missing:
+  - "Full G20 bus/module table not verified in this pass \u2014 BMW G-series training material not found\
+    \ in public sources"
+  - "DME/DDE, EGS and chassis nodes (CAN FD \u2014 no M2 hardware)"
+  grade: C
+  evidence: "OEM-BMW-COMM \u2014 obdii365 BDC3 case study; community G-series notes. A CAN-2.0-only tool's\
+    \ role on G20 is limited to whatever the BDC exposes on classic-CAN DLC pins, if anything."
+- dbc: mercedes_benz_e350_2010
+  platform: "Mercedes W204 C-class (2007\u20132014) \u2014 CAN-C (powertrain)"
+  make: mercedes
+  bus: CAN-C, 500 kbps, DLC pins 6/14
+  modules:
+  - node: ME
+    name: Engine control (e.g. ME9.7)
+  - node: ETC
+    name: 722.9 transmission control
+  - node: ESP
+    name: Electronic stability program
+  missing:
+  - CAN-B interior modules (behind gateway)
+  - MOST audio nodes
+  grade: B
+  evidence: "OEM-MERCEDES-COMM \u2014 community pinout/scan sources; Daimler GF54.21-P-4170GZ (CAN-C 500k)"
+- dbc: mercedes_benz_e350_2010
+  platform: "Mercedes W204 C-class (2007\u20132014) \u2014 CAN-B (interior)"
+  make: mercedes
+  bus: CAN-B, 83.3 kbps (behind gateway; tap at X30 hubs)
+  modules:
+  - node: EZS
+    name: Electronic ignition switch (immobilizer master)
+  - node: SAM_F
+    name: Front SAM
+  - node: SAM_R
+    name: Rear SAM
+  - node: IC
+    name: Instrument cluster (on CAN-E link, connector pins 12/13)
+  missing:
+  - CAN-C powertrain modules
+  grade: C
+  evidence: "OEM-MERCEDES-COMM \u2014 community pinout sources [B/C]; Daimler GF54.21-P-4170GZ (CAN-B\
+    \ 83.3k) [A]"
+- dbc: mercedes_benz_e350_2010
+  platform: "Mercedes W205 C-class (2014\u20132021) \u2014 UDS + DoIP (no dedicated DBC; topology not\
+    \ verified)"
+  make: mercedes
+  bus: UDS-era CAN + DoIP over Ethernet (COMAND/audio section)
+  modules:
+  - node: N3_10
+    name: Engine control MED40/M274 (online SCN coding via XENTRY documented)
+  missing:
+  - Detailed bus/module topology not verified in this pass
+  - Per-module UDS arbitration IDs (undocumented publicly)
+  grade: C
+  evidence: "OEM-MERCEDES-COMM \u2014 aftermarket tool vendors; community notes. Detailed W205 topology\
+    \ is a documented gap."
+- dbc: mercedes_benz_e350_2010
+  platform: "Mercedes W213 E-class (2016\u20132023) \u2014 control-unit overview (no dedicated DBC)"
+  make: mercedes
+  bus: CAN_D / CAN_EXT / CAN_INT / CAN_PTI + Ethernet/DoIP (W213-facelift+); pre-facelift CAN-2.0 at DLC
+    for legislated diagnostics
+  modules:
+  - node: N3_10
+    name: ME-SFI engine control
+  - node: N3_9
+    name: CDI engine control
+  - node: N10_6
+    name: Front SAM
+  - node: N10_8
+    name: Rear SAM
+  - node: N22_1
+    name: Climate control
+  - node: N88
+    name: Tire pressure monitor
+  - node: N112_9
+    name: HERMES telematics
+  - node: N118
+    name: Fuel pump control
+  - node: N83_5
+    name: DC/DC converter (48V models)
+  - node: N97
+    name: Suspension control
+  - node: N5_110
+    name: Weight sensing
+  missing:
+  - Gateway topology detail (beyond control-unit list)
+  grade: B
+  evidence: "OEM-MERCEDES-DOC \u2014 Daimler overall-network (GVN) component overview \xA92023 via mbworld.org;\
+    \ OEM-MERCEDES-COMM \u2014 tool-vendor sources [C]"
+- dbc: volvo_v60_2015_pt
+  platform: "Volvo P2 \u2014 XC90 I (2003\u20132014), representative \u2014 HS-CAN (no P2 DBC in database;\
+    \ nearest: P3-era volvo_v60_2015_pt)"
+  make: volvo
+  bus: HS-CAN, 500 kbps ('05+; 250k in '04), DLC pins 6/14; terminators in BCM + ECM (Bosch EMS MY02+)
+  modules:
+  - node: ECM
+    name: Engine control module
+  - node: TCM
+    name: Transmission control module
+  - node: BCM
+    name: Brake control module (ABS)
+  - node: ETM
+    name: Electronic throttle module
+  - node: SAS
+    name: Steering angle sensor
+  missing:
+  - LS-CAN body modules (separate bus)
+  - CEM itself (gateway, on LS side)
+  grade: B
+  evidence: "OEM-VOLVO-VADIS \u2014 Volvo CAN-bus diagnostics overview (VADIS-era transcription)"
+- dbc: volvo_v60_2015_pt
+  platform: "Volvo P2 \u2014 XC90 I (2003\u20132014), representative \u2014 LS-CAN"
+  make: volvo
+  bus: LS-CAN, 250 kbps ('05+; 125k in '04), DLC pins 3/11; terminators in UEM + REM
+  modules:
+  - node: CEM
+    name: Central electronic module (inter-bus gateway)
+  - node: SRS
+    name: Supplemental restraint system
+  - node: DDM
+    name: Driver door module
+  - node: PDM
+    name: Passenger door module
+  - node: PSM
+    name: Power seat module
+  - node: CCM
+    name: Climate control module
+  - node: DIM
+    name: Driver information module
+  - node: RTI
+    name: Road traffic information
+  - node: PHM
+    name: Phone module
+  - node: AUD
+    name: Audio module
+  - node: REM
+    name: Rear electronic module
+  - node: SWM
+    name: Steering wheel module
+  - node: UEM
+    name: Upper electronic module
+  - node: DEM
+    name: Differential electronic module
+  missing:
+  - HS-CAN powertrain/chassis modules
+  grade: B
+  evidence: "OEM-VOLVO-VADIS \u2014 Volvo CAN-bus diagnostics overview; OEM-VOLVO-COMM \u2014 jasongainor/volvo-p2-pinout\
+    \ (2005 S60R harness) [C]"
+- dbc: volvo_v60_2015_pt
+  platform: "Volvo P3 \u2014 XC60 I (2009\u20132017), representative \u2014 PT bus"
+  make: volvo
+  bus: HS-CAN 500k (6/14) + LS-CAN 250k (3/11); CEM gateway
+  modules:
+  - node: ECM
+    name: Engine control (ECM1/ECM1_2/ECM2/ECM3)
+  - node: TCM
+    name: Transmission control
+  - node: BCM
+    name: Brake control module
+  - node: CEM
+    name: Central electronic module (CEM0/CEM1/CEMBCM0)
+  - node: DIM
+    name: Driver information module (DIM0/DIM1)
+  - node: SRS
+    name: Supplemental restraint (SRS0/SRS1)
+  - node: SAS
+    name: Steering angle sensor (SAS0)
+  - node: PSCM
+    name: Power steering control module
+  - node: FSM
+    name: Forward sensing module
+  - node: CVM
+    name: Camera vision module
+  missing:
+  - "Diagnostic addresses beyond 0x72x\u20130x79x captures (engine-ECM addressing unverified)"
+  grade: B
+  evidence: "OEM-VOLVO-COMM \u2014 opendbc volvo_v60_2015_pt.dbc (41 messages, real community captures);\
+    \ diagnostic addresses 0x726/0x72E (CEM), 0x730/0x738 (PSCM), 0x764/0x76C (FSM), 0x793/0x79B (CVM)"
+- dbc: volvo_v40_2017_pt
+  platform: "Volvo P1 \u2014 V40 (2013\u20132019), representative \u2014 PT bus"
+  make: volvo
+  bus: HS-CAN 500k (6/14) + LS-CAN 250k (3/11); CEM gateway
+  modules:
+  - node: ECM
+    name: Engine control module
+  - node: TCM
+    name: Transmission control module
+  - node: BCM
+    name: Brake control module
+  - node: CEM
+    name: Central electronic module
+  - node: DIM
+    name: Driver information module
+  - node: SRS
+    name: Supplemental restraint system
+  - node: SAS
+    name: Steering angle sensor
+  - node: ACC
+    name: Adaptive cruise control
+  missing:
+  - LS-only body modules (DDM/PDM/PSM/CCM per P2/P3 architecture)
+  grade: B
+  evidence: "OEM-VOLVO-COMM \u2014 opendbc volvo_v40_2017_pt.dbc (51 messages); P1 bus architecture carried\
+    \ through to end of production"
+- dbc: volvo_v60_2015_pt
+  platform: "Volvo SPA \u2014 XC90 II (2016+), representative \u2014 OUT OF M2 SCOPE (no SPA DBC; DoIP/CAN\
+    \ FD)"
+  make: volvo
+  bus: Unified network, four domain masters; diagnostics = DoIP over Ethernet via VOE adapter; in-vehicle
+    buses CAN FD (tool-vendor reports, INFERRED)
+  modules:
+  - node: VDDM
+    name: Vehicle dynamics domain master
+  - node: SDM
+    name: Safety domain master
+  - node: CBDM
+    name: Car body domain master
+  - node: IDM
+    name: Infotainment domain master
+  missing:
+  - Per-module CAN FD topology (not published)
+  - "CMA (XC40 2018+) \u2014 same diagnostic posture (VOE/DoIP), no DBC"
+  grade: C
+  evidence: "OEM-VOLVO-TJ \u2014 Volvo Technical Journal 34165.1.1 (VOE/Ethernet VIDA connection); Volvo\
+    \ Cars SPA press material. SPA/CMA need DoIP/CAN FD \u2014 no M2 hardware path."
+- dbc: subaru_forester_2017
+  platform: "Subaru Global Platform (2017+ Impreza/Crosstrek/Forester/Ascent/Outback-Legacy 2020+) \u2014\
+    \ HS-CAN"
+  make: subaru
+  bus: HS-CAN, 500 kbps, DLC pins 6/14
+  modules:
+  - node: ECM
+    name: Engine control module
+  - node: TCM
+    name: Transmission control module
+  - node: VDC_ABS
+    name: Vehicle dynamics / ABS control
+  - node: EPS
+    name: Electric power steering
+  - node: EyeSight
+    name: Stereo camera (LKAS, cruise, brake, distance, dash status)
+  - node: BIU
+    name: Body integrated unit
+  - node: CLUSTER
+    name: Combination meter
+  - node: HVAC
+    name: Climate control
+  - node: BSD_RCTA
+    name: Blind-spot detection / rear cross-traffic alert radar
+  missing:
+  - CAN-LS body nodes (interior, rate undocumented)
+  - LIN sub-bus devices
+  grade: B
+  evidence: "OEM-SUBARU-COMM \u2014 opendbc subaru_global DBCs (0x002 steering, 0x040 throttle, 0x118/0x121/0x122\
+    \ LKAS, 0x139/0x13A brake/wheels, 0x220-0x222 EyeSight\u2026); comma.ai openpilot wiki [B]"
+- dbc: subaru_outback_2015
+  platform: "Subaru pre-global CAN era (2008\u20132016; BM/BR Legacy/Outback, SH Forester, GH/GE Impreza)\
+    \ \u2014 HS-CAN"
+  make: subaru
+  bus: HS-CAN, 500 kbps, DLC pins 6/14 (SSM2 K-line on pin 7 remains live for SSM diagnostics)
+  modules:
+  - node: ECM
+    name: Engine control module
+  - node: TCM
+    name: Transmission control module
+  - node: VDC_ABS
+    name: VDC/ABS control module
+  - node: BIU
+    name: Body integrated unit
+  - node: CLUSTER
+    name: Combination meter
+  - node: EPB
+    name: Electric parking brake
+  - node: AC
+    name: Air conditioning
+  - node: SAS
+    name: Steering angle sensor
+  - node: EyeSight
+    name: EyeSight camera (where fitted)
+  missing:
+  - CAN-LS nodes
+  - 2005 Legacy transition-year dual-bus split (BIU in the middle)
+  grade: B
+  evidence: "OEM-SUBARU-FSM \u2014 2011 Legacy FSM LAN-diagnostics DTC tables [A] (module list); OEM-SUBARU-COMM\
+    \ \u2014 opendbc subaru_preglobal_2015.dbc [B]"
+- dbc: mazda_2017
+  platform: "Mazda3 BM/BN SkyActiv (2014\u20132018) \u2014 HS-CAN + MS-CAN"
+  make: mazda
+  bus: HS-CAN 500k (6/14) + MS-CAN 125k (3/11, exposed at DLC)
+  modules:
+  - node: PCM
+    name: Powertrain control module
+  - node: TCM
+    name: Transmission control module
+  - node: DSC_HU_CM
+    name: DSC hydraulic unit / control module
+  - node: EPS
+    name: Electric power steering
+  - node: SAS
+    name: Airbag (SAS)
+  - node: IC
+    name: Instrument cluster
+  - node: FBCM_RBCM
+    name: Front/rear body control modules (MS-CAN)
+  - node: HVAC
+    name: Climate control (MS-CAN)
+  - node: AUDIO
+    name: Audio unit (MS-CAN)
+  - node: TPMS
+    name: Tire pressure monitoring (MS-CAN)
+  - node: RKE
+    name: Keyless entry (MS-CAN)
+  missing:
+  - BCMM-style models (different body architecture)
+  grade: B
+  evidence: "OEM-MAZDA-COMM \u2014 Mazda Vehicle Networks training doc; berumiya FBCM/RBCM style classification;\
+    \ opendbc mazda_2017.dbc (102 messages)"
+- dbc: mazda_rx8
+  platform: "Mazda6 GG Ford-shared (2003\u20132008), transitional \u2014 SCP + early CAN (nearest DBC:\
+    \ mazda_rx8, Ford-era)"
+  make: mazda
+  bus: SCP J1850 PWM 41.6k (pins 2/10, primary diag bus early GG) + HS-CAN 500k / MS-CAN 125k (added progressively)
+    + K-line (pin 7)
+  modules:
+  - node: PCM
+    name: Powertrain control module
+  - node: TCM
+    name: Transmission control module
+  - node: ABS
+    name: ABS module
+  - node: IC
+    name: Instrument cluster
+  - node: PJB
+    name: Passenger junction box
+  - node: EHPAS
+    name: Electro-hydraulic power steering
+  missing:
+  - "Full GG CAN module census (progressive rollout \u2014 verify per year)"
+  grade: B
+  evidence: "OEM-MAZDA-COMM \u2014 Mazda training doc (Mazda3/BK example, GG shares architecture); diagnostics\
+    \ are Ford-style (P1000/P1001 self-test, as-built config)"
+- dbc: mazda_2017
+  platform: "Mazda CX-5 KE/KF SkyActiv (2012+) \u2014 HS-CAN + MS-CAN (nearest DBC: mazda_2017; CX-5 2017\u2013\
+    21 dashcam mode)"
+  make: mazda
+  bus: HS-CAN 500k (6/14) + MS-CAN 125k (3/11)
+  modules:
+  - node: PCM
+    name: Powertrain control module
+  - node: TCM
+    name: Transmission control module
+  - node: DSC
+    name: Dynamic stability control
+  - node: EPS
+    name: Electric power steering
+  - node: SRS
+    name: Airbag
+  - node: IC
+    name: Instrument cluster
+  - node: FBCM_RBCM
+    name: Front/rear body control modules (MS-CAN)
+  - node: HVAC
+    name: Climate control (MS-CAN)
+  - node: AUDIO
+    name: Audio unit (MS-CAN)
+  missing:
+  - "7th-gen BP/CX-30 / 2024+ ND3 architecture (possibly CAN FD \u2014 out of M2 scope if so, unverified)"
+  grade: B
+  evidence: "OEM-MAZDA-COMM \u2014 berumiya FBCM/RBCM style classification; opendbc CX-5 2017\u201321\
+    \ dashcam mode; WardsAuto (first SkyActiv model 2012)"

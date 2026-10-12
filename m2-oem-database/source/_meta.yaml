@@ -1,0 +1,396 @@
+pack: M2/SuperB OEM Vehicle Database
+pack_version: 1.4.0
+date: '2026-10-07'
+scope: 'Big Three v1: GM, Ford, Stellantis. Bus architecture, diagnostic access, and opendbc message catalogs.'
+method: "Separate database from the hardware knowledge pack (v1.4.0): vehicle data is community-sourced\
+  \ and variable-quality, so it carries its own evidence grades rather than diluting the hardware pack's\
+  \ bar. Bus/diagnostic facts were researched per-make by three agents (2026-10-06) using web primary\
+  \ sources; message catalogs were mechanically harvested from a shallow clone of commaai/opendbc. Every\
+  \ factual claim carries a grade: A = factory documentation or verified capture; B = reputable community\
+  \ source (opendbc, FORScan docs, well-documented reverse-engineering, trade press); C = single anecdotal\
+  \ report or vendor marketing. Source conflicts are reported, not silently resolved. No seed/key algorithm\
+  \ or gateway bypass is invented or reproduced anywhere in this database \u2014 only publicly documented,\
+  \ legitimate access paths.\n"
+grades:
+  A: Factory documentation or verified capture.
+  B: 'Reputable community source: opendbc, FORScan docs, well-documented reverse-engineering, trade press.'
+  C: Single anecdotal report or vendor marketing copy.
+sources:
+- id: OEM-OPDBC
+  name: "commaai/opendbc (shallow clone @ a7da786, 2026-10-06) \u2014 16 Big Three DBCs, 1366 messages\
+    \ harvested mechanically"
+  path: ~/workspace/m2-oem-database/work/opendbc/opendbc/dbc/
+- id: OEM-KPACK
+  name: "M2/SuperB hardware knowledge pack v1.4.0 \u2014 M2 OBD-II connector mapping, SWCAN/J1850/due_can\
+    \ software facts (VERIFIED)"
+  path: ~/workspace/m2-superb-knowledge/
+- id: OEM-GM-TECH
+  name: "ACDelco TechConnect 'GM Can Communication' \u2014 GM technician publication: three GMLAN buses,\
+    \ bitrates, BCM gateway role"
+- id: OEM-GM-PIN
+  name: "Intrepid Control Systems neoVI OBD-II/J1962 pinout (2002) \u2014 DLC pin assignments incl. SW/MS/HS\
+    \ GMLAN and J1850"
+- id: OEM-GM-SPEC
+  name: "GM Enhanced Diagnostic Test Mode spec excerpt + 11-bit USDT ID table (pcmhacking.net) \u2014\
+    \ $7DF/$7E0-$7E7/$7E8-$7EF"
+- id: OEM-GM-NXP
+  name: "NXP MC33897 product page \u2014 GMW3089v2.4 single-wire CAN: 33.33/83.33 kbps, high-voltage wake-up,\
+    \ 60 uA sleep"
+- id: OEM-GM-COMM
+  name: 'GM community sources: pcmhacking.net, HP Tuners forum, techroute66, owner forums (E38/E67 discussion,
+    tool matrix, year anecdotes)'
+- id: OEM-FORD-FORSCAN
+  name: "FORScan forum + docs \u2014 adapter capability matrix, MS-CAN switch behavior, extended license,\
+    \ service protocols"
+- id: OEM-FORD-OPEN
+  name: "comma.ai openpilot Ford wiki \u2014 supported vehicles, CAN-FD platform list, Gateway Module\
+    \ definition"
+- id: OEM-FORD-COMM
+  name: 'Ford community/RE sources: blueovallabs ford-pscm-re glossary, merlinmb ESP32 Focus project,
+    AutoEnginuity docs, Fordmods training material'
+- id: OEM-STLA-STAR
+  name: "FCA US LLC STAR Online Publication v4.2 (02/06/2017), Jeep case S1508000235 \u2014 DLC pin assignments\
+    \ for CAN-C1/C2/CAN-BH"
+- id: OEM-STLA-SGW
+  name: "AutoAuth/FCA guidance via LAUNCH/TOPDON/Autel/Bosch publications \u2014 SGW behavior, pricing,\
+    \ approved tools"
+- id: OEM-STLA-COMM
+  name: 'Stellantis community sources: jlwranglerforums CAN RE thread, TUCRRC Dodge CAN research, Fender
+    Bender trade articles, ramforum'
+- id: OEM-TOYOTA-TRAIN
+  type: oem_training_doc
+  description: 'Toyota Motor Sales USA multiplex training doc (Aug 2014): CAN 500k HS/250k MS, BEAN 10k,
+    AVC-LAN 17.8k, LIN 9.6k, SIL 10k, MOST 50M; 2004 Prius manual RM1075U gateway ECU function'
+  grade: B
+  name: "Toyota multiplex training doc (Aug 2014) + 2004 Prius manual RM1075U \u2014 CAN/BEAN/AVC-LAN\
+    \ speeds, gateway ECU"
+- id: OEM-TOYOTA-SVC
+  type: oem_service_info
+  description: 'Toyota service info CHECK DLC3 (2012): DLC3 pins 6/14, SIL pulse on pin 7, 54-69 ohm termination
+    spec'
+  grade: A
+  name: "Toyota service info CHECK DLC3 (2012) \u2014 pins 6/14, SIL pulse pin 7, 54-69 ohm termination\
+    \ [A]"
+- id: OEM-TOYOTA-COMM
+  type: community
+  description: 'PriusChat/eveblog/toymods/TacomaWorld/ih8mud: hybrid diagnostic IDs (7E0/7E2/7E3), T-SB-0043-14
+    seed/TIS pass-code flow, BEAN frame format, DLC3 pin surveys'
+  grade: C
+  name: "Toyota community sources (PriusChat/eevblog/TacomaWorld) \u2014 hybrid IDs, TSB T-SB-0043-14\
+    \ seed flow, BEAN frames"
+- id: OEM-HONDA-SVC
+  type: oem_service_manual
+  description: 'Honda service manual (2006-2011 Civic): B-CAN single-wire 33.33 kbps [A], F-CAN 500 kbps,
+    gauge module as F-CAN/B-CAN gateway, K-line pin 7 troubleshooting, MPCS short-connector fallback'
+  grade: A
+  name: "Honda service manual (2006-2011 Civic) \u2014 B-CAN 33.33k single-wire [A], F-CAN, gateway, MPCS\
+    \ fallback"
+- id: OEM-HONDA-COMM
+  type: community
+  description: opendbc hondacan.py (F-CAN A/B segments); hansonFish/papataku 29-bit diagnostic IDs; vanillagorillaa
+    B-CAN tap (150k claim [C]); ScannerDanner gateway case studies
+  grade: C
+  name: Honda community RE (opendbc hondacan.py, 29-bit diagnostic IDs, B-CAN tap projects)
+- id: OEM-VW-SSP
+  type: oem_training_doc
+  description: VW SSP 872802 (Passat 2006-2010 five CAN networks), SSP553 (Tiguan 2017 all-CAN-500k),
+    Audi SSP287 (500k drive / 100k convenience)
+  grade: B
+  name: "VW SSP docs (872802 Passat, 553 Tiguan, Audi SSP287) \u2014 five CAN networks, bitrates, J533\
+    \ gateway"
+- id: OEM-VW-SFD
+  type: oem_workshop_manual
+  description: 'VW SFD manual for independent workshops: 2020/MQB37W introduction, Stage 1/2, reads and
+    bootloader flashing NOT SFD-protected'
+  grade: B
+  name: "VW SFD workshop manual \u2014 SFD scope/stages, reads+flashing NOT protected"
+- id: OEM-VW-VCDS
+  type: tool_vendor
+  description: 'Ross-Tech VCDS: module address convention, Gateway Installation List, direct-CAN/UDS history'
+  grade: B
+  name: "Ross-Tech VCDS \u2014 module addresses, Gateway Installation List"
+- id: OEM-VW-COMM
+  type: community
+  description: Autel/Topdon/OBDeleven SFD unlock paths; KWP-1281 protocol doc; MQB bitrate measurements;
+    CAN-FD MQB Evo (unconfirmed)
+  grade: C
+  name: VW community sources (Autel/OBDeleven SFD paths, KWP-1281 doc, MQB bitrate measurements)
+- id: OEM-HYUNDAI-COMM
+  type: community
+  description: HiCOM manual (protocol timeline, K-line pin zoo, 12-pin connector); bavtech-vci 2018 Kia
+    Soul field test; 2015 C-CAN DBC node names; Kia forum CAN-FD diagnostics note
+  grade: B
+  name: Hyundai/Kia community sources (HiCOM manual, 2018 Soul field test, C-CAN DBC nodes)
+- id: OEM-NISSAN-TSB
+  type: oem_tsb
+  description: 'Nissan TSB NTB10-066C (2024): CAN diagnosis, 60-ohm check, terminators, U1000/U1001/U1002/U1010,
+    model exclusions'
+  grade: A
+  name: "Nissan TSB NTB10-066C (2024) \u2014 CAN diagnosis, terminators, U-codes [A]"
+- id: OEM-NISSAN-DDL
+  type: oem_technical_note
+  description: 'Consult Protocol & Commands Issue 7 (Nissan Technical egroup): DDL 3-wire physical layer,
+    153.6 kHz host clock, init sequence, command set'
+  grade: B
+  name: "Consult Protocol & Commands Issue 7 (Nissan Technical egroup) \u2014 DDL physical layer, command\
+    \ set"
+- id: OEM-NISSAN-COMM
+  type: community
+  description: nissan-leaf-obd-manual, qashqai-can-info, howeypeter Pathfinder project (query-only DLC,
+    0x21 vs 0x22, 500 kbps captures)
+  grade: C
+  name: "Nissan community captures (Leaf OBD manual, Qashqai/Pathfinder projects) \u2014 500 kbps, query-only\
+    \ DLC, 0x21 vs 0x22"
+- id: OEM-SAE-J2012
+  type: standard_transcription
+  name: "SAE J2012 generic DTC transcriptions (community) \u2014 P0xxx/P2xxx/P34xx/B0xxx/C0xxx/U0xxx;\
+    \ SAE text itself paywalled, no A grades claimed"
+  grade: C
+- id: OEM-GM-SI
+  type: oem_service_info
+  name: GM Service Information excerpts (gm.saturn.team archive), GM TSBs (2186567, 04-06-04-047G, 08-07-30-013),
+    Corvette/Terraza SI master DTC lists
+  grade: B
+- id: OEM-FORD-SI
+  type: oem_service_info
+  name: Ford 2008 master P/B/C/U DTC chart, Ford 2004 OBD System Operation Summary (motorcraftservice.com),
+    stdrivers Ford OBD-II list
+  grade: B
+- id: OEM-FCA-SI
+  type: oem_service_info
+  name: FCA service-manual excerpts (charm.li), FCA TSB 08-119-15, Mitchell/DTC databases
+  grade: B
+- id: OEM-TOYOTA-DTC
+  type: oem_service_info
+  name: Toyota/Lexus service-manual excerpts (2001 Prius RM778U, 2004 Corolla RM1037U, 2004 Prius RM1076E,
+    2002 GS300 via charm.li), Toyota Service Information prints
+  grade: B
+- id: OEM-HONDA-DTC
+  type: oem_service_info
+  name: Honda advanced-diagnostics PDFs, Honda service-manual U-code troubleshooting, technician sources
+  grade: B
+- id: OEM-VW-DTC
+  type: oem_service_info
+  name: Ross-Tech wiki fault-code pages, VW TSB 01-21-10 (via NHTSA), VAG DTC transcriptions with 5-digit
+    mappings
+  grade: B
+- id: OEM-HYUNDAI-DTC
+  type: oem_service_info
+  name: "Hyundai TechNet Times (National Service Training & Support Dept. \u2014 codes match shop manuals/GDS),\
+    \ transcribed Hyundai DTC documents"
+  grade: B
+- id: OEM-NISSAN-DTC
+  type: oem_service_info
+  name: Nissan/Infiniti service-manual excerpts (NATS chart, BRC section), TSB NTB10-066C (U1000 family),
+    transcribed Nissan DTC lists
+  grade: B
+- id: OEM-UDS-ISO
+  type: standard
+  name: "ISO 14229-1:2013 Table C.1 (via testerpresent.com.au) \u2014 standardized DID numbers/names [A];\
+    \ sizes/session server-defined"
+  grade: A
+- id: OEM-DID-BIG3
+  type: oem_engineering_spec
+  name: "GM GMW3110 \xA79.3.2.4.2 (GMLAN $1A DIDs); Ford Global Diagnostic Specification Part One v2003.0;\
+    \ jlwranglerforums UDS RE (Stellantis)"
+  grade: B
+- id: OEM-DID-IMPORTS
+  type: community
+  name: OBDb signalsets (Toyota Prius, VW ID.4), OVMS vehicle_vweup, papataku/honda_ehev_analyzer, canair
+    captures, Leaf TCU community app, Pathfinder capture
+  grade: B
+- id: OEM-FORD-ASBUILT
+  type: community
+  name: "FORScan community (forums, docs, as-built spreadsheets) \u2014 module addresses, block purposes,\
+    \ checksum/format"
+  grade: B
+- id: OEM-MODULE-MAPS
+  type: community
+  name: DBC BU_ node lists cross-checked against make bus-architecture briefs + platform topology sources
+  grade: B
+- id: OEM-TOYOTA-MANUAL
+  type: oem_service_info
+  name: Toyota/Lexus repair-manual excerpts via third-party mirrors (zatonevkredit.ru, toyotamanuals.gitlab.io,
+    ttundra.com, tovenza.com, to4runner.net, ttguide.net, charm.li; TSB T-SB-0172-13 via NHTSA)
+  grade: B
+- id: OEM-TOYOTA-HYBRID
+  type: community
+  name: "\"Toyota Prius OBDII Fault Code Guide\" (scribd community transcription) \u2014 Gen-1/2 Prius\
+    \ hybrid DTCs"
+  grade: C
+- id: OEM-TOYOTA-COMM
+  type: community
+  name: Toyota owner forums and technician threads (priuschat, tacomaworld, 4runners.com, tundras.com,
+    yarisworld, JustAnswer Toyota)
+  grade: C
+- id: OEM-HONDA-SB03020
+  type: oem_service_bulletin
+  name: Honda Service Bulletin 03-020 "OBD II DTCs and Their Associated Monitors" (2003-03-29), detection-item
+    list
+  grade: A
+- id: OEM-HONDA-LISTS
+  type: community
+  name: Honda DTC compilations (ninjafix.in, 5 Star Auto Repair, freeautomechanic.com, cars-care.net)
+  grade: C
+- id: OEM-HONDA-BLINK
+  type: community
+  name: Honda SRS/ABS/VSA blink-code charts (honda-tech.com technician transcription, civic5.com, JustAnswer
+    Honda technician threads)
+  grade: B
+- id: OEM-HONDA-TRS
+  type: oem_technical_notice
+  name: American Honda Interactive Network TRS message (2018-2020 Accord/Insight BCM DTCs) via oemdtc.com
+    NHTSA filing
+  grade: B
+- id: OEM-NISSAN-FSM
+  type: oem_service_info
+  name: Nissan/Infiniti FSM excerpts (2008 Altima EC, 2007 Xterra, 2010 Altima SRC, 2014 Cube SRS)
+  grade: B
+- id: OEM-NISSAN-COMM
+  type: community
+  name: Nissan owner forums and technician threads (sr20-forum, JustAnswer Nissan, CarProTool scan reports)
+  grade: C
+- id: OEM-HYUNDAI-TECHNET
+  type: oem_service_info
+  name: Hyundai TechNet Times Vol. 24 Issue 02 (8th-edition Hyundai DTC listing, manuals.plus mirror)
+  grade: A
+- id: OEM-HYUNDAI-SVC
+  type: oem_service_info
+  name: Hyundai/Kia shop-manual pages via charm.li; MOHAVE/BORREGO service manual; AFLS training doc;
+    Restraint shop-manual DTC table
+  grade: A
+- id: OEM-HYUNDAI-TSB
+  type: oem_tsb
+  name: HMA TSBs via NHTSA/oemdtc (MDPS MC-10180981-0001/MC-10170896-0001; TPMS 23-BE-001H); AutoHex Hyundai
+    DTC Help (service-info-derived)
+  grade: A
+- id: OEM-HYUNDAI-DB
+  type: community
+  name: Hyundai/Kia DTC compilations (automanual, avtotachki, carcarehacks, OBDCodex, hyundaibook.ru,
+    carscounsel.com, import-car.com, HVAC DTC list)
+  grade: B
+- id: OEM-VW-OBDB
+  type: community
+  name: miskibin/obd2-dashboard research-multibrand-extended-pids.md (formulas derived from OBDb v3 captures,
+    CC BY-SA)
+  grade: B
+- id: OEM-HONDA-WN7
+  type: community
+  name: cnc-lasercraft/honda-wn7-wican obd-protocol.md (2026 Honda WN7 reverse-engineering, MCS-capture
+    cross-checked)
+  grade: C
+- id: OEM-SUBARU-FSM
+  type: oem_service_info
+  name: Subaru FSM excerpts via jdmcarmanuals.com (Legacy/Impreza/Tribeca engine, VDC, LAN and immobilizer
+    diagnostics)
+  grade: A
+- id: OEM-SUBARU-SSM
+  type: community
+  name: RomRaider SsmProtocol documentation (SSM2 frame format, commands, parameter addresses)
+  grade: B
+- id: OEM-SUBARU-COMM
+  type: community
+  name: Subaru community sources (OBDCodex/scribd DTC transcriptions, forums, opendbc Subaru DBCs, FreeSSM/BtSsm
+    docs)
+  grade: C
+- id: OEM-MAZDA-SVC
+  type: oem_service_info
+  name: Mazda workshop-manual DTC tables; Mazda M-Tip MT-004/18 (MNAO, via manuals.plus); Mazda service-manual
+    DTC pages
+  grade: B
+- id: OEM-MAZDA-COMM
+  type: community
+  name: Mazda community sources (Vehicle Networks training doc via rx8club, berumiya 6th-gen CAN DBC project,
+    FORScan community, owner forums)
+  grade: C
+- id: OEM-BMW-TRAIN
+  type: oem_training_doc
+  name: BMW technical training (ST401 Body Electronics II bus systems, E90 vehicle electrical, F30 complete
+    vehicle)
+  grade: A
+- id: OEM-BMW-SIB
+  type: oem_service_bulletin
+  name: BMW SIB 11 02 08 (VANOS faults 2A82/2A87, via oemdtc/NHTSA)
+  grade: A
+- id: OEM-BMW-COMM
+  type: community
+  name: BMW community sources (bimmerforums E90 CAN project, N54 DME code lists, Tool32 MSD80 archives,
+    scribd DTC transcriptions, owner threads)
+  grade: C
+- id: OEM-MERCEDES-DOC
+  type: oem_service_info
+  name: Daimler AG component descriptions (GF54.21-P-4170GZ central gateway), W211 networking training,
+    Daimler DAS (1999) fault-code printouts
+  grade: A
+- id: OEM-MERCEDES-COMM
+  type: community
+  name: Mercedes community sources (mercedes-hacking-docs, scainner RESEARCH.md, forums, scribd DTC transcriptions,
+    Autocom scan reports)
+  grade: C
+- id: OEM-VOLVO-VADIS
+  type: oem_service_info
+  name: "Volvo CAN-bus diagnostics overview (VADIS-era transcription): E000/E001, CEM-1A51\u20131A64,\
+    \ DF03\u2013DF16, resistor locations"
+  grade: B
+- id: OEM-VOLVO-TJ
+  type: oem_technical_journal
+  name: Volvo Technical Journal 34165.1.1 (VOE/Ethernet VIDA connection on SPA/CMA)
+  grade: B
+- id: OEM-VOLVO-COMM
+  type: community
+  name: Volvo community sources (harness pinout repos, forums, opendbc Volvo DBCs, carcarehacks fault-code
+    list, V-Tool/VDASH docs)
+  grade: C
+changelog:
+- version: 1.4.0
+  date: '2026-10-07'
+  notes: 'Three-track expansion. (1) Five new makes: Subaru (SSM2 protocol + 30-entry SSM parameter-address
+    catalog, FSI/FSM DTCs, module maps), Mazda (HS/MS-CAN era split, DTCs, module maps), BMW (E/F/G bus
+    generations, 0x6F1 KWP2000 diagnostic scheme, factory hex DTCs, module maps), Mercedes-Benz (CAN-B/C/D/E,
+    filtered-DLC behavior, DAS/community DTCs, module maps), Volvo (P1/P2/P3 dual-CAN + CEM gateway, proprietary
+    diagnostic addressing, CEM module-code DTCs, module maps). (2) Thin-spot fills: +4 Stellantis DIDs,
+    +18 Honda/VW body/chassis DIDs (with DID-reuse conflict notes), Hyundai/Kia B/C/U corroboration (117
+    codes -> A, 50 -> B; truncated descriptions expanded; 7 conflicts + 1 not-found carried with caveats).
+    (3) Import DTC expansion: +175 Toyota/Lexus, +Honda P-codes and SRS/ABS/VSA blink-code mappings (as
+    their own entries, never forced into B1xxx/C1xxx), +183 Nissan/Infiniti. Schema notes: DTC code pattern
+    widened (BMW factory hex, Honda blink codes, Volvo module codes, UDS failure-type byte); DID make
+    enum + pattern widened (Subaru 3-byte SSM addresses, service SSM2). Known gaps: Mazda/Volvo/Mercedes
+    manufacturer DID catalogs effectively empty; G-series BMW / SPA-CMA Volvo / 2021+ Mercedes secure-gateway
+    = out of M2 scope (CAN FD / DoIP / Ethernet).'
+- version: 1.3.0
+  date: '2026-10-06'
+  notes: 'Platform-level depth (no VIN required): 581 UDS DIDs (36 ISO-standard [A] + 545 make-specific:
+    GM 7, Ford 13, Stellantis 3, Toyota 124, Honda 59, VW 280, Hyundai 33, Nissan 26); Nissan entries
+    flagged 0x21-local (KWP2000-style local IDs, not 0x22). Ford as-built reference: 41 module addresses
+    with block ranges, checksum/format spec, UDS read/write mapping. Per-platform bus/module maps for
+    all 32 DBC platforms (DBC node names cross-checked against bus briefs; gateway-forwarded traffic flagged).
+    Known thin spots: Stellantis DIDs (single community source), VAG/Honda B/C-code DIDs, Hyundai ECU-scoped
+    DID numbering.'
+- version: 1.2.1
+  date: '2026-10-06'
+  notes: 'Import DTC expansion: +851 manufacturer-specific codes (108 Toyota/Lexus, 90 Honda/Acura, 140
+    VW Group, 440 Hyundai/Kia, 73 Nissan/Infiniti). Total catalog now 3,344 DTCs across all 8 makes. Same
+    per-entry format and A/B/C grading as v1.2.0. Known thin spots: VAG B/C codes (5-digit only, no verified
+    P/B/C equivalents), Honda B1xxx/C1xxx (blink-code era), Hyundai B/C/U single-source sections.'
+- version: 1.2.0
+  date: '2026-10-06'
+  notes: 'New DTC catalog: 2,493 trouble codes (2,098 SAE J2012 generic + 395 Big Three manufacturer-specific:
+    107 GM, 182 Ford, 106 Stellantis). Each entry: code, description, category, scope, possible causes
+    and diagnostic notes where sources support them (186 with causes, 242 with notes), graded A/B/C (27/1080/1386).
+    Inference-flagged causes/notes from researchers were omitted rather than laundered. Ford split-grade
+    entries keep the description grade with grade detail preserved in evidence. Imports (Toyota/Honda/VW/Hyundai/Nissan)
+    deferred to v1.2.1.'
+- version: 1.1.0
+  date: '2026-10-06'
+  notes: 'Added Toyota/Lexus, Honda/Acura, VW Group, Hyundai/Kia, Nissan/Infiniti (8 makes total). Signal-level
+    decode for ALL 32 DBCs: 21,568 signals with start bit, length, byte order, factor, offset, unit. Big
+    Three message count 1366 -> 1368 (whitespace-aware parser now includes two indented BO_ records in
+    gm_global_a_object.dbc). New findings: Honda B-CAN maps to M2 SWCAN circuit; Toyota DLC3 is HS-CAN
+    only; VW SFD blocks writes but not reads or bootloader flashing; Hyundai/Kia use KWP2000-over-CAN
+    (2005-2010); Nissan uses KWP-style 0x21 reads (0x22 rejected) and has a query-only BCM gateway DLC.'
+- version: 1.0.0
+  date: '2026-10-06'
+  summary: 'Initial Big Three release: bus architecture + diagnostic access for GM, Ford, Stellantis;
+    16 opendbc DBCs (1366 messages); 12-question validation.'
+version: 1.4.0
+build_date: '2026-10-07'

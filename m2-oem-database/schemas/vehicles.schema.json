@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Vehicle message catalog harvested from opendbc DBC files (Big Three only for v1).",
+  "properties": {
+    "entries": {
+      "items": {
+        "properties": {
+          "dbc": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "grade": {
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          "make": {
+            "type": "string"
+          },
+          "message_count": {
+            "type": "integer"
+          },
+          "messages": {
+            "items": {
+              "properties": {
+                "dlc": {
+                  "type": "integer"
+                },
+                "id_dec": {
+                  "type": "integer"
+                },
+                "id_hex": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "signals": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "start_bit",
+                      "length",
+                      "byte_order",
+                      "factor",
+                      "offset"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "start_bit": {
+                        "type": "integer"
+                      },
+                      "length": {
+                        "type": "integer"
+                      },
+                      "byte_order": {
+                        "enum": [
+                          "intel",
+                          "motorola"
+                        ]
+                      },
+                      "signed": {
+                        "type": "boolean"
+                      },
+                      "factor": {
+                        "type": "number"
+                      },
+                      "offset": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id_dec",
+                "id_hex",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "vehicles_note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "make",
+          "dbc",
+          "grade",
+          "messages"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "entries"
+  ],
+  "title": "vehicles",
+  "type": "object"
+}

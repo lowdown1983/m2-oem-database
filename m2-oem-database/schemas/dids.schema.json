@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "entries": {
+      "items": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "did": {
+            "description": "Hex identifier: 2-byte UDS DID (e.g. 0xF190), 1-byte KWP2000-style local ID (e.g. 0x04, Nissan), or 3-byte SSM2 parameter address (e.g. 0x000007, Subaru, service SSM2).",
+            "pattern": "^0x[0-9A-Fa-f]{2,6}$",
+            "type": "string"
+          },
+          "ecu_context": {
+            "description": "Which ECU address / module the DID was observed on (import makes)",
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "grade": {
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          "make": {
+            "description": "'iso' for ISO 14229-1 standard DIDs, else a make key from makes.yaml",
+            "enum": [
+              "bmw",
+              "ford",
+              "gm",
+              "honda",
+              "hyundai",
+              "iso",
+              "mazda",
+              "mercedes",
+              "nissan",
+              "stellantis",
+              "subaru",
+              "toyota",
+              "volvo",
+              "vw"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "security": {
+            "type": "string"
+          },
+          "session": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "description": "0x22 normally; 0x21-local for Nissan KWP2000-style local IDs; SSM2 for Subaru SSM parameter addresses."
+          }
+        },
+        "required": [
+          "did",
+          "name",
+          "description",
+          "make",
+          "grade"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "entries"
+  ],
+  "title": "M2 OEM database \u2014 UDS DID catalog (v1.3)",
+  "type": "object"
+}
